@@ -11,6 +11,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -123,9 +124,14 @@ public class StepUtil {
 	 * @param
 	 */
 	public static boolean isPresent(By by,WebDriver driver){
-
+		WebDriver simpleDriver = driver;
+		if(driver instanceof EventFiringWebDriver){
+			EventFiringWebDriver eventFirDriver = (EventFiringWebDriver)driver;
+			simpleDriver = eventFirDriver.getWrappedDriver();
+		}
+		
 		try{
-			if(driver.findElements(by).size()>0){
+			if(simpleDriver.findElements(by).size()>0){
 				return true;
 			}}catch(Exception e){
 				return false;
