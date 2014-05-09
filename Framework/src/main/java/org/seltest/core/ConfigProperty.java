@@ -64,20 +64,6 @@ public final class ConfigProperty {
 		log.debug("Url Loaded : {} ",URL);
 		return URL;
 	}
-//	
-//	/**
-//	 * Returns the Home Page Url <br/>
-//	 * <b> Field : homeUrl
-//	 */
-//	public static String getHomeUrl(){
-//		//Validate URL Has http:// 
-//		String URL =getProperty("homeUrl");
-//		if((!URL.contains("http"))){
-//			throw new  SelTestException(name+".properties Value , Invalid URL '"+URL+"' : should contain protocol name Ex http://");
-//		}
-//		log.debug("Url Loaded : {} ",URL);
-//		return URL;
-//	}
 
 	public static String getDriverPath(){
 		String path = USER_HOME+getProperty("driverPath");
