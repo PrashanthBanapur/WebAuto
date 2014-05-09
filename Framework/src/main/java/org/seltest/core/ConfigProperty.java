@@ -129,18 +129,6 @@ public final class ConfigProperty {
 	}
 	
 	/**
-	 * Returns the Browser Instance Type <br/>
-	 * <b> Field : browserInstance
-	 */
-	public static String getBrowserInstance(){
-		String browserInstance = getProperty("browserInstance");
-		if(!(browserInstance.equalsIgnoreCase("suite")||browserInstance.equalsIgnoreCase("tests"))){
-			throw new SelTestException("Invalid Browser Instance Option : "+browserInstance);
-		}
-		return browserInstance;
-	}
-	
-	/**
 	 * Return on which case screen shot should be captured <br/>
 	 * <b> Field : captureScreenshot
 	 */

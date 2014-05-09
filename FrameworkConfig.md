@@ -7,17 +7,21 @@
 # 2. chrome		: Chrome Browser
 # 3. ie			: Internet Explorer
 # Note : chrome and ie need driverPath set with driver executables
+org.seltest.driver.Browser
 
 # Driver Executable Path
 # Path Relative to ${user.home}
+org.seltest.driver.DriverPath
 
 # Enable Log For All the WebDriver Events
-# IMP *** Should only be Set to false for testing
+# IMP *** Should only be Set to false for testing affects wait functionality
+org.seltest.driver.EventFiring= true
 
 # Base URL for the Application
-
+org.seltest.app.BaseUrl
 
 #Browser Opens In FullScreen Mode
+org.seltest.app.FullScreen
 
 # ******** Parallel Execution is Dependent on this property *************
 #Number Of Browser Instance 
