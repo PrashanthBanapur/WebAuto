@@ -1,5 +1,6 @@
 package org.seltest.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -22,14 +23,15 @@ public enum Config {
 	private void init(){
 
 		if(property==null){
+			setAtuReport();
 			property = new Properties();
 			try {
 				property.load(Config.class.getClassLoader().getResourceAsStream(PATH));
 			} catch (IOException e) {
 				throw new SelTestException("Unable to Load Resources : "+PATH);
 			}
-			value = (String) property.get(this.toString());
 		}
+		value = (String) property.get(this.toString());
 	}
 	public String getValue() {
 		if (value == null) {
@@ -38,6 +40,9 @@ public enum Config {
 		return value;
 	}
 
-
+	private static void setAtuReport(){
+		String path = new File("./","src/main/resources/atu.properties").getAbsolutePath();
+		System.setProperty("atu.reporter.config", path);
+	}
 
 }
