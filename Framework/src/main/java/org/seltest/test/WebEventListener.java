@@ -6,7 +6,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.AbstractWebDriverEventListener;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.seltest.core.ConfigProperty;
+import org.seltest.core.Config;
 import org.seltest.core.StepUtil;
 import org.seltest.driver.DriverListener;
 import org.slf4j.Logger;
@@ -15,20 +15,21 @@ import org.slf4j.LoggerFactory;
 public class WebEventListener extends AbstractWebDriverEventListener {
 
 	private final Logger log = LoggerFactory.getLogger("STEP");
-	private final int MIN_WAIT=3; // Imp don't reduce the time unless you are sure
-
+	private static final int MIN_WAIT=3; // Imp don't reduce the time unless you are sure
+	private static final String WAIT_TYPE = Config.waitType.getValue();
+	private static final int IMPLICIT_WAIT_TIME = Integer.parseInt(Config.implicitWait.getValue());
 
 
 	public void afterClickOn(WebElement element , WebDriver driver){
 		//Implicit Wait 
-		if(ConfigProperty.getWaitType().equals("implicit")){
-			StepUtil.simpleWait(ConfigProperty.getImplicitWaitTime());
+		if(WAIT_TYPE.equals("implicit")){
+			StepUtil.simpleWait(IMPLICIT_WAIT_TIME);
 		}else{
 			StepUtil.simpleWait(MIN_WAIT);
 		}
 	}
 	public void beforeFindBy(By by, WebElement element, WebDriver driver) {
-		if(ConfigProperty.getWaitType().equals("explicit")){
+		if(WAIT_TYPE.equals("explicit")){
 			StepUtil.waitElement(driver,ExpectedConditions.visibilityOfElementLocated(by));
 		}
 	}

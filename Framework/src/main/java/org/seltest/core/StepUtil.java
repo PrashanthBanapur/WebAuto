@@ -57,7 +57,7 @@ public class StepUtil {
 	 * @see ExpectedConditions
 	 */
 	public static void waitElement(WebDriver driver , ExpectedCondition<WebElement> expectedCondition){
-		WebDriverWait wait = new WebDriverWait(driver, ConfigProperty.getExplictWaitTime());
+		WebDriverWait wait = new WebDriverWait(driver, Long.parseLong(Config.explictWait.getValue()));
 		wait.until(expectedCondition);
 		wait.pollingEvery(1, TimeUnit.SECONDS);
 		wait.ignoring(NoSuchElementException.class);
