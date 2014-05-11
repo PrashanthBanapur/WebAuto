@@ -9,6 +9,7 @@
 	<description>Web Application Automation Testing Framework</description>
 	<modules>
 		<module>Framework</module>
+		<module>DemoApp</module>
 	</modules>
 	<dependencies>
 		<dependency>
