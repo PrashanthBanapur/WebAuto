@@ -5,5 +5,14 @@
     <artifactId>WebAuto</artifactId>
     <version>0.1</version>
   </parent>
-  <artifactId>Framework</artifactId>
+  <artifactId>DemoApp</artifactId>
+  <name>DemoApp</name>
+  <description>Demo App to Test the framework and Show usage of framework</description>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.seltest</groupId>
+  		<artifactId>Framework</artifactId>
+  		<version>0.1</version>
+  	</dependency>
+  </dependencies>
 </project>

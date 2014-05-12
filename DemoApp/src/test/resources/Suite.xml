@@ -1,0 +1,14 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Login Suite">
+	<test name="Login Tests">
+		<listeners>
+			<listener class-name="atu.testng.reports.listeners.ATUReportsListener"></listener>
+			<listener class-name="atu.testng.reports.listeners.ConfigurationListener"></listener>
+			<listener class-name="atu.testng.reports.listeners.MethodListener"></listener>
+		</listeners>
+		<classes>
+			<class name="testcase.TC_SIGN_ON"></class>
+		</classes>
+	</test>
+</suite>

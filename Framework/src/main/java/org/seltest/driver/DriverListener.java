@@ -4,7 +4,6 @@
 package org.seltest.driver;
 
 import org.openqa.selenium.WebDriver;
-import org.seltest.core.ConfigProperty;
 import org.seltest.core.StepUtil;
 import org.seltest.test.ReportUtil;
 import org.slf4j.Logger;
@@ -27,11 +26,8 @@ public class DriverListener  extends TestListenerAdapter implements ISuiteListen
 	private static ThreadLocal<String> testName = new ThreadLocal<String>();
 	private Logger test = LoggerFactory.getLogger("TEST");
 	private Logger conf = LoggerFactory.getLogger("CONFIG");
-	private static String browserInstance;
+	private static String parallelMode;
 	private static Boolean suiteCalled = false; //TODO To avoid calling suite listeners twice
-	static{
-		browserInstance = ConfigProperty.getBrowserInstance();
-	}
 
 
 	public static String getTestName() {
@@ -98,7 +94,7 @@ public class DriverListener  extends TestListenerAdapter implements ISuiteListen
 	@Override
 	public void onStart(ITestContext context) {
 		conf.info("	(START)	 -> Tests Name : {} ",context.getName()); 
-		if(browserInstance.equalsIgnoreCase("tests")){
+		if(parallelMode.equals("tests")){
 			createWebDriver();
 		}
 	}
@@ -106,18 +102,21 @@ public class DriverListener  extends TestListenerAdapter implements ISuiteListen
 	@Override
 	public void onFinish(ITestContext context) {
 		conf.info("	(FINISHED)	 -> Tests Name : {} ",context.getName()); 
-		if(browserInstance.equalsIgnoreCase("tests")){
+		if(parallelMode.equals("tests")){
 			quitWebDriver();
 		}
 
 	}
 	@Override
 	public void onStart(ISuite suite) {
+		
+		parallelMode=suite.getParallel().toLowerCase();// Get parallel mode
+		
 		if(!suiteCalled){
 			conf.info("");
 			conf.info("	******* STARTED TEST SUITE ******");
 			conf.info("	");
-			if(browserInstance.equalsIgnoreCase("suite")){
+			if(!parallelMode.equals("tests")){ // Only Tests supported
 				createWebDriver();
 			}
 			suiteCalled=true;
@@ -130,7 +129,7 @@ public class DriverListener  extends TestListenerAdapter implements ISuiteListen
 			conf.info("	");
 			conf.info("	****** FINISHED TEST SUITE ******");
 			conf.info("	");
-			if(browserInstance.equalsIgnoreCase("suite")){
+			if(!parallelMode.equals("tests")){
 				quitWebDriver();
 			}
 			suiteCalled=false;

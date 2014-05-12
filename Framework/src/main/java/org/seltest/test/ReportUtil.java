@@ -1,6 +1,6 @@
 package org.seltest.test;
 
-import org.seltest.core.ConfigProperty;
+import org.seltest.core.Config;
 import org.seltest.driver.DriverManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,7 @@ import atu.testng.reports.ATUReports;
 
 public class ReportUtil {
 	
-	private static final String screenShot = ConfigProperty.getScreenshot();
+	private static final String screenShot = Config.captureScreenshot.getValue();
 	private static final Logger log = LoggerFactory.getLogger(ReportUtil.class);
 	/**
 	 * Report result of test case

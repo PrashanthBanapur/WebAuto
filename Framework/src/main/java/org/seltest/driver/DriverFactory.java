@@ -7,7 +7,7 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.seltest.core.ConfigProperty;
+import org.seltest.core.Config;
 import org.seltest.test.WebEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,30 +21,30 @@ final class DriverFactory {
 	private static Boolean fullscreen;
 
 	static{
-		browser = ConfigProperty.getBrowser();
-		driverPath=ConfigProperty.getDriverPath();
-		eventFiring=ConfigProperty.getEventFiring();
-		fullscreen=ConfigProperty.getFullScreen();
+		browser = Config.browser.getValue();
+		driverPath=Config.driverPath.getValue();
+		eventFiring=Boolean.parseBoolean(Config.eventfiring.getValue());
+		fullscreen=Boolean.parseBoolean(Config.fullscreen.getValue());
 	}
 	/**
 	 * Method to get WebDriver based on app properties
 	 */
 	 static WebDriver getDriver(){
 		WebDriver driver=null;
-		if(browser.equalsIgnoreCase(Browser.FIREFOX.name())){
+		if(browser.equalsIgnoreCase("FIREFOX")){
 			driver = new FirefoxDriver();
 			log.debug("Firefox Driver Created : {}" ,driver);
 
-		}else if(browser.equalsIgnoreCase(Browser.CHROME.name())){			
+		}else if(browser.equalsIgnoreCase("CHROME")){			
 			System.setProperty("webdriver.chrome.driver", driverPath+"/chromedriver.exe");
 			driver = new ChromeDriver();
 			log.debug("Chrome Driver Created : {}" ,driver);
 
-		}else if(browser.equalsIgnoreCase(Browser.ANDROID.name())){
+		}else if(browser.equalsIgnoreCase("ANDROID")){
 			driver = new RemoteWebDriver(DesiredCapabilities.android());
 			log.debug("Android Driver Created : {}" ,driver);
 
-		}else if(browser.equalsIgnoreCase(Browser.IE.name())){
+		}else if(browser.equalsIgnoreCase("IE")){
 			System.setProperty("webdriver.ie.driver", driverPath+"/iedriver.exe");
 			driver = new InternetExplorerDriver();
 			log.debug("IE Driver Created : {}" ,driver);
