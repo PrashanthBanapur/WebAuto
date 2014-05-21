@@ -8,7 +8,7 @@ import org.openqa.selenium.support.events.AbstractWebDriverEventListener;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.seltest.core.Config;
 import org.seltest.core.StepUtil;
-import org.seltest.driver.DriverListener;
+import org.seltest.core.TestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +89,7 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 	}
 
 	private String getTestName(){
-		String name = DriverListener.getTestName();
+		String name = TestCase.getTestName();
 		if(name!=null)
 			return name;
 		else

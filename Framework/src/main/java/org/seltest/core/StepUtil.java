@@ -16,7 +16,6 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.seltest.driver.DriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.SkipException;
@@ -91,7 +90,7 @@ public class StepUtil {
 	 * @return status 
 	 */
 	public static Boolean switchWindow(WebDriver driver,String title){
-		String testName = DriverListener.getTestName();
+		String testName = TestCase.getTestName();
 		Set<String> windows = driver.getWindowHandles();
 		log.info("		|<{}>	--(SWITCH WINDOW)	-> To Page : {}",testName,title);
 		for(String window : windows){
@@ -108,7 +107,7 @@ public class StepUtil {
 	 * @param driver
 	 */
 	public static void windowClose(WebDriver driver){
-		String testName = DriverListener.getTestName();
+		String testName = TestCase.getTestName();
 		Set<String> windows = driver.getWindowHandles();
 		log.info("		|<{}>	-(CLOSE WINDOW)	-> Page Title : {}",testName,driver.getTitle());
 		driver.close();
