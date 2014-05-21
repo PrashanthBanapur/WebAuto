@@ -1,12 +1,11 @@
 package testcase;
 
-import org.testng.annotations.Listeners;
+import org.seltest.core.TestInfo;
 import org.testng.annotations.Test;
-import org.seltest.driver.DriverListener;
 
 import pageobject.SignOnPage;
 
-@Listeners({DriverListener.class})
+@TestInfo(author="aditya",lastModified="21-May-2014",version="1.0")
 public class TC_SIGN_ON extends Tests{
   @Test
   public void SignOn() {
