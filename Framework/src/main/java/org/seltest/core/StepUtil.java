@@ -8,7 +8,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
@@ -22,7 +24,7 @@ import org.testng.SkipException;
 
 /**
  * @author adityas
- *
+ * All the Methods for executing Test Steps which are not provided by Webdriver
  */
 public class StepUtil {
 	private static final Logger log = LoggerFactory.getLogger("STEP");
@@ -89,7 +91,7 @@ public class StepUtil {
 	 * @param title
 	 * @return status 
 	 */
-	public static Boolean switchWindow(WebDriver driver,String title){
+	public static Boolean windowSwitch(WebDriver driver,String title){
 		String testName = TestCase.getTestName();
 		Set<String> windows = driver.getWindowHandles();
 		log.info("		|<{}>	--(SWITCH WINDOW)	-> To Page : {}",testName,title);
@@ -128,7 +130,7 @@ public class StepUtil {
 			EventFiringWebDriver eventFirDriver = (EventFiringWebDriver)driver;
 			simpleDriver = eventFirDriver.getWrappedDriver();
 		}
-		
+
 		try{
 			if(simpleDriver.findElements(by).size()>0){
 				return true;
@@ -206,7 +208,80 @@ public class StepUtil {
 
 	}
 
+	/**
+	 *  Draws a red border around the found element
+	 * @param driver
+	 * @param element
+	 * @return current border
+	 */
+	public static String highlightElement(WebDriver driver,WebElement element) {
+		// draw a border around the found element
+		String border = null;
+		if (driver instanceof JavascriptExecutor) {
+			border = (String) ((JavascriptExecutor)driver).executeScript(SCRIPT_GET_ELEMENT_BORDER, element);
+			((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", element);
+		}
+		return border;
 
-}
+	}
+
+	/**
+	 * Un Highlight Already Highlighted Element 
+	 * @param driver
+	 * @return
+	 */
+	public static WebElement unhighlightElement(WebDriver driver , WebElement element , String border){
+		if (driver instanceof JavascriptExecutor) {
+			try {
+				((JavascriptExecutor)driver).executeScript(SCRIPT_UNHIGHLIGHT_ELEMENT, element, border);
+			} catch (StaleElementReferenceException ignored) {
+				// the page got reloaded, the element isn't there
+			} 
+		}
+		return element;
+	}
+
+
+	private static final String SCRIPT_GET_ELEMENT_BORDER = 
+			" var elem = arguments[0]; "+
+					" if (elem.currentStyle) { "+
+					"   var style = elem.currentStyle; "+
+					"   var border = style['borderTopWidth'] "+
+					"           + ' ' + style['borderTopStyle'] "+
+					"          + ' ' + style['borderTopColor'] "+
+					"          + ';' + style['borderRightWidth'] "+
+					"          + ' ' + style['borderRightStyle'] "+
+					"          + ' ' + style['borderRightColor'] "+
+					"          + ';' + style['borderBottomWidth'] "+
+					"          + ' ' + style['borderBottomStyle'] "+
+					"          + ' ' + style['borderBottomColor'] "+
+					"          + ';' + style['borderLeftWidth'] "+
+					"          + ' ' + style['borderLeftStyle'] "+
+					"          + ' ' + style['borderLeftColor']; "+
+					"	} else if (window.getComputedStyle) { "+
+					"  var style = document.defaultView.getComputedStyle(elem); "+
+					"   var border = style.getPropertyValue('border-top-width') "+
+					"          + ' ' + style.getPropertyValue('border-top-style') "+
+					"           + ' ' + style.getPropertyValue('border-top-color') "+
+					"           + ';' + style.getPropertyValue('border-right-width') "+
+					"           + ' ' + style.getPropertyValue('border-right-style') "+
+					"           + ' ' + style.getPropertyValue('border-right-color') "+
+					"           + ';' + style.getPropertyValue('border-bottom-width') "+
+					"           + ' ' + style.getPropertyValue('border-bottom-style') "+
+					"           + ' ' + style.getPropertyValue('border-bottom-color') "+
+					"           + ';' + style.getPropertyValue('border-left-width') "+
+					"           + ' ' + style.getPropertyValue('border-left-style') "+
+					"           + ' ' + style.getPropertyValue('border-left-color'); "+
+					"	} "+
+					"return border;" ;
+
+	private static final String SCRIPT_UNHIGHLIGHT_ELEMENT =
+			"	var elem = arguments[0]; "+
+					"var borders = arguments[1].split(';');"+
+					"elem.style.borderTop = borders[0];"+
+					"elem.style.borderRight = borders[1];"+
+					"elem.style.borderBottom = borders[2];"+
+					"elem.style.borderLeft = borders[3];";
+} 
 
 

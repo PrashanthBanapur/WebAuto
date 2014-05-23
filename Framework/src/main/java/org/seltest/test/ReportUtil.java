@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import atu.testng.reports.ATUReports;
 
 public class ReportUtil {
-	
+
 	private static final String screenShot = Config.captureScreenshot.getValue();
 	private static final Logger log = LoggerFactory.getLogger(ReportUtil.class);
 	/**
@@ -18,13 +18,13 @@ public class ReportUtil {
 	 * @param msg2
 	 */
 	public static void reportResult(String desp , String msg1 , String msg2 ){
-		
+
 		if(screenShot.equals("all")||screenShot.equals("result")){
 			reportWithScreenshot(desp, msg1,msg2);
 		}else {
 			ATUReports.add(desp, msg1,msg2,false);
 		}
-		
+
 	}
 	/**
 	 * Report Web Event 
@@ -33,13 +33,13 @@ public class ReportUtil {
 	 * @param msg2
 	 */
 	static void reportWebStep(String desp , String msg1 , String msg2){
-		
+
 		if(screenShot.equals("all")){
 			reportWithScreenshot(desp, msg1,msg2);
 		}else {
 			ATUReports.add(desp, msg1,msg2,false);
 		}
-		
+
 	}
 	/**
 	 * Report Test case Assertions
@@ -61,7 +61,7 @@ public class ReportUtil {
 			ATUReports.add(desp, expected,actual,false);
 		}
 	}
-	
+
 	/**
 	 * Report Exceptions at Runtime
 	 * @param desp
@@ -71,7 +71,7 @@ public class ReportUtil {
 	static void reportException(String desp,String msg1 , String msg2){
 		reportWithScreenshot(desp, msg1,msg2);
 	}
-	
+
 	private synchronized  static void reportWithScreenshot(String msg1 , String msg2 , String msg3){
 		try{
 			ATUReports.setWebDriver(DriverManager.getDriver());
