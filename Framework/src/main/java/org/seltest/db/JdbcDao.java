@@ -38,9 +38,9 @@ public class JdbcDao {
 	
 	public Connection openConn() throws SQLException {
 		//jdbc:sqlserver://server:port;DatabaseName=dbname
-		String url = "jdbc:sqlserver://172.16.26.167;DatabaseName=6.0_GA_Blank";
-		String uname = "KDA_qa";
-		String pass = "Harmony123";
+		String url = "jdbc:sqlserver://*********;DatabaseName=**********";
+		String uname = "********";
+		String pass = "********";
 	
 			Connection conn = (Connection) DriverManager.getConnection(url,uname,pass);
 			return conn;
