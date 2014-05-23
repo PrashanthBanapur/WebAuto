@@ -39,7 +39,7 @@ public class ListenerHelper {
 		TestCase.setTestName(result.getName());
 		
 	
-		Class<?> testClass = result.getTestClass().getRealClass();
+		Class<?> testClass = result.getTestClass().getRealClass();//TODO Change ?
 		
 		if(testClass.isAnnotationPresent(TestInfo.class)){
 			Annotation annotation =testClass.getAnnotation(TestInfo.class);
@@ -158,7 +158,9 @@ public class ListenerHelper {
 	
 	private synchronized void setTestInfo(){
 		
+		if(TestCase.getAuthor()!=null){
 		ATUReports.setAuthorInfo(TestCase.getAuthor(), TestCase.getDate(), TestCase.getVersion());
+		}
 	}
 
 }

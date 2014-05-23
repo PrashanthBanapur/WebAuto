@@ -49,7 +49,9 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 			elementValue=element.getText();
 		}
 		log.info("		|<{}>	-(CLICK ON)	-> Element = '{}' ",getTestName(),elementValue);
+		String border =StepUtil.highlightElement(driver, element);
 		ReportUtil.reportWebStep("CLICK",elementValue,"");
+		StepUtil.unhighlightElement(driver, element,border);
 
 	}
 
@@ -57,6 +59,7 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		String elemValue = element.getAttribute("value");
 		String elemName = element.getAttribute("name");
 		String elemId = element.getAttribute("id");
+		String border=StepUtil.highlightElement(driver, element);
 		if(elemId.length()>3){
 			log.info("		|<{}>	-(CHANGED)	-> Element = '{}' New Value = '{}' ",getTestName(),elemId,elemValue);
 			ReportUtil.reportWebStep("CHANGED",elemId,elemValue);
@@ -64,8 +67,9 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		}else{
 			log.info("		|<{}>	-(CHANGED)	-> Element = '{}' New Value = '{}' ",getTestName(),elemName,elemValue);
 			ReportUtil.reportWebStep("CHANGED",elemId,elemValue);
-
 		}
+		StepUtil.unhighlightElement(driver, element,border);
+
 	}
 
 	public void beforeChangeValueOf(WebElement element, WebDriver driver) {
