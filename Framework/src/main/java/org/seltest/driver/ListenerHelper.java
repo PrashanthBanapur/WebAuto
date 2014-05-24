@@ -4,7 +4,6 @@ import java.io.File;
 import java.lang.annotation.Annotation;
 
 import org.openqa.selenium.WebDriver;
-import org.seltest.core.Step;
 import org.seltest.core.StepUtil;
 import org.seltest.core.TestCase;
 import org.seltest.core.TestInfo;

@@ -24,7 +24,12 @@ public enum Config {
 	captureScreenshot,
 	waitType,
 	implicitWait,
-	explictWait;
+	explictWait,
+	dbDriver,
+	dbUrl,
+	dbUsername,
+	dbPassword,	
+	;
 
 	private static final String PATH = "webapp.properties";
 	private static final Logger log = LoggerFactory.getLogger(Config.class);
@@ -78,6 +83,17 @@ public enum Config {
 		case  waitType :
 			if(val.equals("implicit"))
 				log.warn(" explict wait improves execution time by 30 %");
+			break;
+		case dbDriver:
+			//TODO Add validation
+			break;
+		case dbPassword:
+			break;
+		case dbUrl:
+			break;
+		case dbUsername:
+			break;
+		default:
 			break;
 		}
 

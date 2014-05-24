@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.seltest.core.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ public class JdbcDao {
 	static {
 		try {
 			
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			Class.forName(Config.dbDriver.getValue());
 		} catch (ClassNotFoundException e) {
 			log.error("JDBC Class load : {}"+e.getLocalizedMessage());
 		}
@@ -37,10 +38,9 @@ public class JdbcDao {
 	}
 	
 	public Connection openConn() throws SQLException {
-		//jdbc:sqlserver://server:port;DatabaseName=dbname
-		String url = "jdbc:sqlserver://*********;DatabaseName=**********";
-		String uname = "********";
-		String pass = "********";
+		String url = Config.dbUrl.getValue();
+		String uname = Config.dbUsername.getValue();
+		String pass = Config.dbPassword.getValue();
 	
 			Connection conn = (Connection) DriverManager.getConnection(url,uname,pass);
 			return conn;
