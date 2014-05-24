@@ -33,5 +33,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="/WebAuto/jar/driverListener.jar"/>
+	<classpathentry kind="lib" path="/WebAuto/jar/ATUReporter.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
