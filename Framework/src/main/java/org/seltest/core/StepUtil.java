@@ -13,11 +13,10 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.seltest.driver.DriverManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.SkipException;
@@ -28,12 +27,14 @@ import org.testng.SkipException;
  */
 public class StepUtil {
 	private static final Logger log = LoggerFactory.getLogger("STEP");
+	private static final Step STEP= new Step();
+
 
 	/**
 	 * 
 	 * Wait for the mentioned Time in seconds
 	 * <b> Uses tread.sleep
-	 * @param 
+	 * @param Time in seconds
 	 */
 	public static void simpleWait(int minWait){
 		log.debug("		|-(SIMPLE WAIT)	-> TIME = '{}' ",minWait);
@@ -45,46 +46,27 @@ public class StepUtil {
 	}
 
 	/**
-	 * Implicit wait for the mentioned time
-	 * @param Time in seconds
-	 */
-	public static void waitImplicit(WebDriver driver ,int minWait) {
-
-		driver.manage().timeouts().implicitlyWait(minWait, TimeUnit.SECONDS);
-
-	}
-	/**
-	 * Wait For a particular expected condition
+	 * Wait For a particular expected condition . <br/>
+	 * <b> Max Timeout depends on config properties <b/>
 	 * @see ExpectedConditions
 	 */
-	public static void waitElement(WebDriver driver , ExpectedCondition<WebElement> expectedCondition){
+	public static void waitElement(WebDriver driver ,ExpectedCondition<WebElement> expectedCondition){
 		WebDriverWait wait = new WebDriverWait(driver, Long.parseLong(Config.explictWait.getValue()));
 		wait.until(expectedCondition);
 		wait.pollingEvery(1, TimeUnit.SECONDS);
 		wait.ignoring(NoSuchElementException.class);
 	}
 
-
 	/**
-	 * Select a Value based on visible text from List 
-	 * @param ddList
-	 * @param val
+	 * Implicit wait for the mentioned time
+	 * @param Time in seconds
 	 */
-	public static void select(WebElement ddList ,String val){
-		Select option = new Select(ddList);
-		option.selectByVisibleText(val);
+	public static void waitImplicit(int minWait) {
+		WebDriver driver = DriverManager.getDriver();
+		driver.manage().timeouts().implicitlyWait(minWait, TimeUnit.SECONDS);
+
 	}
-
-	/**
-	 * Get the Text selected in a drop down list
-	 * @see driver.getText() method      
-	 */
-	public static String getSelectedText(WebElement ddList){
-		Select option = new Select(ddList);
-		return option.getFirstSelectedOption().getText();
-	}
-
-
+	
 	/**
 	 * Switch to the new window opened after clicking a link
 	 * @param driver
@@ -119,41 +101,7 @@ public class StepUtil {
 		}
 	}
 
-	/**
-	 * Check if WebElement is present in the page
-	 * Returns the boolean
-	 * @param
-	 */
-	public static boolean isPresent(By by,WebDriver driver){
-		WebDriver simpleDriver = driver;
-		if(driver instanceof EventFiringWebDriver){
-			EventFiringWebDriver eventFirDriver = (EventFiringWebDriver)driver;
-			simpleDriver = eventFirDriver.getWrappedDriver();
-		}
-
-		try{
-			if(simpleDriver.findElements(by).size()>0){
-				return true;
-			}}catch(Exception e){
-				return false;
-			}
-		return false;
-	}
-
-	/**
-	 * Method to Find the text in WebElement
-	 * @param element
-	 * @return Text in the field
-	 */
-	public static String getText(WebElement element) {
-		String value = element.getAttribute("value");
-		if(value!= null){
-			return value;
-		}else{
-			return element.getText();
-		}
-	}
-
+	
 	/**
 	 * Get the Row of a table 
 	 * @param driver
@@ -165,7 +113,7 @@ public class StepUtil {
 		int i=0;
 
 		while(true){
-			StepUtil.simpleWait(2);// TODO Need As findElements does not have explicit Wait
+			simpleWait(2);// TODO Need As findElements does not have explicit Wait
 			// Now get all the TR elements from the table 
 			List<WebElement> allRows = table.findElements(By.tagName("tr")); 
 
@@ -178,7 +126,7 @@ public class StepUtil {
 				}
 			}
 			//Next Page
-			if(StepUtil.isPresent(By.linkText(((2+i)+"")), driver)){
+			if(STEP.isPresent(By.linkText(((2+i)+"")), driver)){
 				driver.findElement(By.linkText((2+i)+"")).click();
 			}else{
 				return null;

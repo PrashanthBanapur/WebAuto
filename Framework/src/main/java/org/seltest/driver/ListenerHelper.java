@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.annotation.Annotation;
 
 import org.openqa.selenium.WebDriver;
+import org.seltest.core.Step;
 import org.seltest.core.StepUtil;
 import org.seltest.core.TestCase;
 import org.seltest.core.TestInfo;
@@ -149,7 +150,7 @@ public class ListenerHelper {
 
 	private synchronized void quitWebDriver(){
 		WebDriver driver = DriverManager.getDriver();
-		StepUtil.waitImplicit(driver ,5);
+		StepUtil.waitImplicit(5);
 		if (driver != null) {
 			driver.quit();
 		}

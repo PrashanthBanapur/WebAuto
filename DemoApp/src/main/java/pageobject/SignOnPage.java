@@ -28,23 +28,23 @@ public class SignOnPage extends PageObject {
 	}
 
 	public String getUserName() {
-		return txtUserName.getText();
+		return STEP.getText(txtUserName);
 	}
 
 	public void setUserName(String val) {
-		txtUserName.sendKeys(val);;
+		STEP.sendKeys(txtUserName, val);
 	}
 
 	public String getPassword() {
-		return txtPassword.getText();
+		return STEP.getText(txtPassword);
 	}
 
 	public void setPassword(String val) {
-		txtPassword.sendKeys(val);
+		STEP.sendKeys(txtPassword,val);
 	}
 
 	public void clickLogin() {
-		imgLogin.click();;
+		STEP.click(imgLogin);;
 	}
 
 }
