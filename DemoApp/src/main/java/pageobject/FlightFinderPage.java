@@ -21,7 +21,7 @@ public class FlightFinderPage extends PageObject {
 	private WebElement ddToPort;
 	@FindBy(name="toMonth")
 	private WebElement ddToMonth;
-	@FindBy(name="ToDay")
+	@FindBy(name="toDay")
 	private WebElement ddToDay;
 	@FindBy(name="servClass")
 	private WebElement rBtnServiceClass;

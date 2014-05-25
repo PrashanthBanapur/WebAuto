@@ -13,5 +13,13 @@ public class TC_FIND_FLIGHT extends Tests{
 	  flightFinder.selectPassCount("3");
 	  flightFinder.selectFromPort("London");
 	  flightFinder.selectTripType("oneway");
+	  flightFinder.selectFromMonth("May");
+	  flightFinder.selectFromDay("25");
+	  flightFinder.selectToPort("Paris");
+	  flightFinder.selectToMonth("May");
+	  flightFinder.selectToDay("28");
+	  flightFinder.selectClass("First");
+	  flightFinder.selectAirlinePref("Unified Airlines");
+	  flightFinder.clickContineu();
   }
 }
