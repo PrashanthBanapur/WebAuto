@@ -3,6 +3,7 @@ package pageobject;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.seltest.core.PageObject;
 
 public class SignOnPage extends PageObject {
@@ -21,10 +22,11 @@ public class SignOnPage extends PageObject {
 		super(driver);
 	}
 	
-	public void defaultLogin(){
+	public FlightFinderPage defaultLogin(){
 		setUserName(USERNAME);
 		setPassword(PASSWORD);
 		clickLogin();
+		return PageFactory.initElements(driver, FlightFinderPage.class);
 	}
 
 	public String getUserName() {
