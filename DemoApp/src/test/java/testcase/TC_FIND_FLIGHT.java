@@ -10,9 +10,10 @@ public class TC_FIND_FLIGHT extends Tests{
   public void findFlight() {
 	  SignOnPage signon= home.clickSignOn();
 	  FlightFinderPage flightFinder=signon.defaultLogin();
+	 
+	  flightFinder.selectTripType("oneway");
 	  flightFinder.selectPassCount("3");
 	  flightFinder.selectFromPort("London");
-	  flightFinder.selectTripType("oneway");
 	  flightFinder.selectFromMonth("May");
 	  flightFinder.selectFromDay("25");
 	  flightFinder.selectToPort("Paris");

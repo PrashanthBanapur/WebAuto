@@ -30,23 +30,23 @@ public class SignOnPage extends PageObject {
 	}
 
 	public String getUserName() {
-		return STEP.getText(txtUserName);
+		return step.getText(txtUserName);
 	}
 
 	public void setUserName(String val) {
-		STEP.sendKeys(txtUserName, val);
+		step.sendKeys(txtUserName, val);
 	}
 
 	public String getPassword() {
-		return STEP.getText(txtPassword);
+		return step.getText(txtPassword);
 	}
 
 	public void setPassword(String val) {
-		STEP.sendKeys(txtPassword,val);
+		step.sendKeys(txtPassword,val);
 	}
 
 	public void clickLogin() {
-		STEP.click(imgLogin);;
+		step.click(imgLogin);;
 	}
 
 }

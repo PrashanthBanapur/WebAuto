@@ -9,7 +9,7 @@ import org.openqa.selenium.WebDriver;
  */
 public class PageObject {
 	protected WebDriver driver;
-	protected final static Step STEP = new Step();
+	protected final static Step step = new Step();
 
 	public PageObject(WebDriver driver){
 		this.driver=driver;

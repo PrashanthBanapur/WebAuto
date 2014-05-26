@@ -1,5 +1,7 @@
 package org.seltest.core;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -50,6 +52,22 @@ public class Step {
 	 */
 	public void click(WebElement element) {
 		element.click();
+	}
+	
+
+	/**
+	 * 
+	 * @param lstRadioButton List of Radio Buttons
+	 * @param val Unique button value
+	 */
+	public void clickRadioButton(List<WebElement> lstRadioButton, String val) {
+		
+		for(WebElement radioBtn : lstRadioButton){
+			if(radioBtn.getAttribute("value").equals(val)){
+				radioBtn.click();
+			}
+		}
+		
 	}
 
 	/**
@@ -140,6 +158,9 @@ public class Step {
 	public void submit(WebElement element) {
 		element.submit();
 	}
+
+
+
 
 
 }
