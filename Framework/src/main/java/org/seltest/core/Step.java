@@ -1,12 +1,14 @@
 package org.seltest.core;
 
 import java.util.List;
+import java.util.Set;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.Select;
+import org.seltest.driver.DriverManager;
 
 
 public class Step {
@@ -26,6 +28,25 @@ public class Step {
 		option.selectByVisibleText(val);
 	}
 
+	
+	/**
+	 * Click on a Checkbox by finding using css
+	 * @param element WebElement which has check box
+	 */
+	public void Checkboxclick(WebElement element) {
+		element.findElement(By.cssSelector("input[type='checkbox']")).click();;
+	}
+	
+	/**
+	 * Click on a Checkbox only if its not selected
+	 * @param element WebElement which has check box
+	 */
+	public void checkboxSelect(WebElement element) {
+		WebElement checkbox =element.findElement(By.cssSelector("input[type='checkbox']"));
+		if(!checkbox.isSelected()){
+			checkbox.click();
+		}
+	}
 	/**
 	 * Get the Text selected in a drop down list
 	 * @param ddList List to find the text      
@@ -52,6 +73,24 @@ public class Step {
 	 */
 	public void click(WebElement element) {
 		element.click();
+	}
+	
+	/**
+	 * Click on a WebElement and switch to the new Window
+	 * @param element
+	 */
+	public void clickAndSwitch(WebElement element){
+		
+		WebDriver driver = DriverManager.getDriver();
+		String winHandleBefore = driver.getWindowHandle();
+		element.click();
+		Set<String> windows = driver.getWindowHandles();
+		
+		for(String window : windows){
+			if(!window.equals(winHandleBefore)){
+				driver.switchTo().window(window);
+			}
+		}
 	}
 	
 

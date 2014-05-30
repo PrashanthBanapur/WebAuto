@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.seltest.core.StepUtil;
 import org.seltest.core.TestCase;
 import org.seltest.core.TestInfo;
+import org.seltest.test.LoggerUtil;
 import org.seltest.test.ReportUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,97 +24,80 @@ import atu.testng.reports.ATUReports;
  *
  */
 public class ListenerHelper {
-	
-	private Logger test = LoggerFactory.getLogger("TEST");
+
 	private Logger conf = LoggerFactory.getLogger("CONFIG");
+	private LoggerUtil logger = new LoggerUtil();
 	private static String parallelMode;
 	private static Boolean suiteCalled = false; //TODO To avoid calling suite listeners twice
 
 	// restricting to Package Access
-	 ListenerHelper(){
-		
+	ListenerHelper(){
+
 	}
-	
+
 	public void onTestStart(ITestResult result) {
-		test.info("	(START)	-> Test Case : {} ",result.getName());
 		TestCase.setTestName(result.getName());
-		
-	
-		Class<?> testClass = result.getTestClass().getRealClass();//TODO Change ?
-		
-		if(testClass.isAnnotationPresent(TestInfo.class)){
-			Annotation annotation =testClass.getAnnotation(TestInfo.class);
-			TestInfo testInfo = (TestInfo) annotation;
-	 		
-			TestCase.setAuthor(testInfo.author());
-			TestCase.setDate(testInfo.lastModified());
-			TestCase.setVersion(testInfo.version());
-		}
+		logger.testLogger("	(START)	-> Test Case : ");
+		processAnnotation(result);
+
 	}
 
-	
 	public void onTestSuccess(ITestResult result) {
-		test.info("	(SUCCESS)	-> Test Case : {} ",result.getName());
+		//test.info("	(SUCCESS)	-> Test Case : {} ",result.getName());
+		logger.testLogger("	(SUCCESS)	-> Test Case : ");
+		setTestInfo();
 		ReportUtil.reportResult("SUCCESS", result.getName(), "");
-		setTestInfo();
 	}
 
-	
 	public void onTestFailure(ITestResult result) {
-		test.info("	(FAIL)	-> Test Case : {} ",result.getName());
+		logger.testLogger("	(FAIL)	-> Test Case : ");
+		setTestInfo();
 		ReportUtil.reportResult("FAIL", result.getName(), "");
-		setTestInfo();
 
 	}
 
-	
 	public void onTestSkipped(ITestResult result) {
-		test.info("	(SKIPPED)	-> Test Case : {} ",result.getName());
-		ReportUtil.reportResult("SKIP", result.getName(), "");
+		logger.testLogger("	(SKIPPED)	-> Test Case : ");
 		setTestInfo();
+		ReportUtil.reportResult("SKIP", result.getName(), "");
 
 	}
 
-	
 	public void beforeConfiguration(ITestResult result) {
-		conf.info("	(START)	-> Config Name : {} ",result.getName());
+		logger.testLogger("	(START)	-> Config Name : ");
 	}
 
-	
 	public void onConfigurationFailure(ITestResult result){
-		conf.info("	(FAIL)	-> Config Name : {} ",result.getName());
+		logger.testLogger("	(FAIL)	-> Config Name : ");
 	}
 
-	
 	public void onConfigurationSkip(ITestResult result){
-		conf.info("	(SKIPPED)	-> Config Name : {} ",result.getName());
-	}
-	
-	public void onConfigurationSuccess(ITestResult result){
-		conf.info("	(SUCCESS)	-> Config Name : {} ",result.getName());
+		logger.testLogger("	(SKIPPED)	-> Config Name : ");
 	}
 
-	
+	public void onConfigurationSuccess(ITestResult result){
+		logger.testLogger("	(SUCCESS)	-> Config Name : ");
+	}
+
 	public void onStart(ITestContext context) {
-		conf.info("	(START)	 -> Tests Name : {} ",context.getName()); 
+		logger.testLogger("	(START)	 -> Tests Name : ",context.getName()); 
 		if(parallelMode.equals("tests")){
 			createWebDriver();
 		}
 	}
 
-	
 	public void onFinish(ITestContext context) {
-		conf.info("	(FINISHED)	 -> Tests Name : {} ",context.getName()); 
+		logger.testLogger("	(FINISHED)	 -> Tests Name : ",context.getName()); 
 		if(parallelMode.equals("tests")){
 			quitWebDriver();
 		}
 
 	}
-	
+
 	public void onStart(ISuite suite) {
-		
+
 		parallelMode=suite.getParallel().toLowerCase();// Get parallel mode
-		
+
 		if(!suiteCalled){
 			conf.info("");
 			conf.info("	******* STARTED {} ******",suite.getName().toUpperCase());
@@ -128,7 +112,6 @@ public class ListenerHelper {
 		}
 	}
 
-	
 	public void onFinish(ISuite suite) {
 		if(suiteCalled){
 			conf.info("	");
@@ -141,13 +124,17 @@ public class ListenerHelper {
 		}
 	}
 
-	private synchronized void createWebDriver(){
+	private void createWebDriver(){
 		WebDriver driver = DriverFactory.getDriver();
 		DriverManager.setWebDriver(driver);	
-		ATUReports.setWebDriver(DriverManager.getDriver());
+		try{
+			ATUReports.setWebDriver(DriverManager.getDriver());
+		}catch(Exception e){
+			// TODO Not yet implemented
+		}
 	}
 
-	private synchronized void quitWebDriver(){
+	private void quitWebDriver(){
 		WebDriver driver = DriverManager.getDriver();
 		StepUtil.waitImplicit(5);
 		if (driver != null) {
@@ -155,12 +142,24 @@ public class ListenerHelper {
 		}
 
 	}
-	
+
 	private synchronized void setTestInfo(){
-		
+
 		if(TestCase.getAuthor()!=null){
-		ATUReports.setAuthorInfo(TestCase.getAuthor(), TestCase.getDate(), TestCase.getVersion());
+			ATUReports.setAuthorInfo(TestCase.getAuthor(), TestCase.getDate(), TestCase.getVersion());
 		}
 	}
 
+	private void processAnnotation(ITestResult result) {
+		Class<?> testClass = result.getTestClass().getRealClass();//TODO Change ?
+
+		if(testClass.isAnnotationPresent(TestInfo.class)){
+			Annotation annotation =testClass.getAnnotation(TestInfo.class);
+			TestInfo testInfo = (TestInfo) annotation;
+
+			TestCase.setAuthor(testInfo.author());
+			TestCase.setDate(testInfo.lastModified());
+			TestCase.setVersion(testInfo.version());
+		}
+	}
 }

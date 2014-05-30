@@ -3,6 +3,7 @@
  */
 package org.seltest.core;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -68,22 +69,31 @@ public class StepUtil {
 	}
 	
 	/**
-	 * Switch to the new window opened after clicking a link
+	 * Switch to the window based on the title <br/>
+	 * Use <b>clickSwitch() </b> to switch to new window
 	 * @param driver
 	 * @param title
 	 * @return status 
+	 * @exception IllegalArgumentException if both the title are same
 	 */
-	public static Boolean windowSwitch(WebDriver driver,String title){
+	public static void windowSwitch(WebDriver driver,String title){
 		String testName = TestCase.getTestName();
 		Set<String> windows = driver.getWindowHandles();
+		String window=null;
+		Iterator<String> winItr = windows.iterator();
+
+		if(driver.getTitle().equals(title)){ // Both have same title switch to 2nd
+			throw new IllegalArgumentException("Current Title and Swicth window title are same ");
+		}
 		log.info("		|<{}>	--(SWITCH WINDOW)	-> To Page : {}",testName,title);
-		for(String window : windows){
+
+		while(winItr.hasNext()){
+			window = winItr.next();
 			WebDriver switchWin=driver.switchTo().window(window);
 			if(switchWin.getTitle().equals(title)){
-				return true;
+				break;
 			}
 		}
-		return false;
 	}
 
 	/**
@@ -101,7 +111,7 @@ public class StepUtil {
 		}
 	}
 
-	
+
 	/**
 	 * Get the Row of a table 
 	 * @param driver
@@ -116,7 +126,6 @@ public class StepUtil {
 			simpleWait(2);// TODO Need As findElements does not have explicit Wait
 			// Now get all the TR elements from the table 
 			List<WebElement> allRows = table.findElements(By.tagName("tr")); 
-
 			// And iterate over them, getting the cells 
 			for (WebElement row : allRows) { 
 				String rowText = row.getText();
@@ -154,6 +163,11 @@ public class StepUtil {
 
 		return 0; //TODO GET LATENCY
 
+	}
+	
+	public static void acceptAlert(WebDriver driver){
+		StepUtil.simpleWait(3);
+		driver.switchTo().alert().accept();
 	}
 
 	/**

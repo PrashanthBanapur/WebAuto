@@ -1,5 +1,8 @@
 package org.seltest.test;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -8,7 +11,6 @@ import org.openqa.selenium.support.events.AbstractWebDriverEventListener;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.seltest.core.Config;
 import org.seltest.core.StepUtil;
-import org.seltest.core.TestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,7 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 	private static final int MIN_WAIT=3; // Imp don't reduce the time unless you are sure
 	private static final String WAIT_TYPE = Config.waitType.getValue();
 	private static final int IMPLICIT_WAIT_TIME = Integer.parseInt(Config.implicitWait.getValue());
+	LoggerUtil logger = new LoggerUtil();
 
 
 	public void afterClickOn(WebElement element , WebDriver driver){
@@ -36,7 +39,7 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 
 
 	public void afterNavigateTo(String url, WebDriver driver) {
-		log.info("		|<{}>	-(NAVIGATE)	-> To Url : {}",getTestName(),url);
+		logger.webLooger("(NAVIGATE)	-> To Url : "+url);
 		StepUtil.simpleWait(MIN_WAIT);
 		ReportUtil.reportWebStep("GO TO ", url , "");
 	}
@@ -48,7 +51,7 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		}else{
 			elementValue=element.getText();
 		}
-		log.info("		|<{}>	-(CLICK ON)	-> Element = '{}' ",getTestName(),elementValue);
+		logger.webLooger("(CLICK ON)	-> Element = '"+elementValue+"'");
 		String border =StepUtil.highlightElement(driver, element);
 		ReportUtil.reportWebStep("CLICK",elementValue,"");
 		StepUtil.unhighlightElement(driver, element,border);
@@ -61,11 +64,11 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		String elemId = element.getAttribute("id");
 		String border=StepUtil.highlightElement(driver, element);
 		if(elemId.length()>3){
-			log.info("		|<{}>	-(CHANGED)	-> Element = '{}' New Value = '{}' ",getTestName(),elemId,elemValue);
+			logger.webLooger("(CHANGED)	-> Element = '"+elemId+"' New Value = '"+elemValue+"'");
 			ReportUtil.reportWebStep("CHANGED",elemId,elemValue);
 
 		}else{
-			log.info("		|<{}>	-(CHANGED)	-> Element = '{}' New Value = '{}' ",getTestName(),elemName,elemValue);
+			logger.webLooger("(CHANGED)	-> Element = '"+elemName+"' New Value = '"+elemValue+"'");
 			ReportUtil.reportWebStep("CHANGED",elemId,elemValue);
 		}
 		StepUtil.unhighlightElement(driver, element,border);
@@ -77,9 +80,9 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		String elemName = element.getAttribute("name");
 		String elemId = element.getAttribute("id");
 		if(elemId.length()>3){
-			log.info("		|<{}>	-(CHANGING)	-> Element = '{}' Old Value = '{}' ",getTestName(),elemId,elemValue);
+			logger.webLooger("(CHANGING)	-> Element = '"+elemId+"' Old Value = '"+elemValue+"' ");
 		}else {
-			log.info("		|<{}>	-(CHANGING)	-> Element = '{}' Old Value = '{}' ",getTestName(),elemName,elemValue);
+			logger.webLooger("(CHANGING)	-> Element = '"+elemName+"' Old Value = '"+elemValue+"' ");
 
 		}
 	}
@@ -87,17 +90,14 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 
 	public void onException(Throwable throwable, WebDriver driver) {
 		if(!(throwable instanceof NoSuchElementException) ){
-			log.error("		|<{}>	-(EXCEPTION) 	-> Message = {} ",getTestName(),throwable.getLocalizedMessage());
+			logger.webLooger("(EXCEPTION) 	-> Message = "+throwable.getLocalizedMessage()+" ");
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			throwable.printStackTrace(pw);
+			log.error(sw.toString()); // stack trace as a string
 			ReportUtil.reportException("EXCEPTION", throwable.getLocalizedMessage().substring(0, 50), "");// TODO Make it Small message
 		}
 	}
 
-	private String getTestName(){
-		String name = TestCase.getTestName();
-		if(name!=null)
-			return name;
-		else
-			return "config";
-	}
 
 }
