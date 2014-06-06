@@ -16,10 +16,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.seltest.driver.DriverManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.seltest.test.LoggerUtil;
 import org.testng.SkipException;
 
 /**
@@ -27,7 +27,8 @@ import org.testng.SkipException;
  * All the Methods for executing Test Steps which are not provided by Webdriver
  */
 public class StepUtil {
-	private static final Logger log = LoggerFactory.getLogger("STEP");
+	//private static final Logger log = LoggerFactory.getLogger("STEP");
+	private static final LoggerUtil logger = LoggerUtil.getLogger();
 	private static final Step STEP= new Step();
 
 
@@ -38,7 +39,7 @@ public class StepUtil {
 	 * @param Time in seconds
 	 */
 	public static void simpleWait(int minWait){
-		log.debug("		|-(SIMPLE WAIT)	-> TIME = '{}' ",minWait);
+		logger.webLogger("		|-(SIMPLE WAIT)	-> TIME = "+minWait+" sec ");
 		try {
 			Thread.sleep(minWait*1000);
 		} catch (InterruptedException e) {
@@ -46,16 +47,66 @@ public class StepUtil {
 		}
 	}
 
+	public static void waitForPageLoaded(WebDriver driver) {
+
+		ExpectedCondition<Boolean> expectation = new
+				ExpectedCondition<Boolean>() {
+			public Boolean apply(WebDriver driver) {
+				return ((JavascriptExecutor)driver).executeScript("return document.readyState").equals("complete");
+			}
+		};
+
+		Wait<WebDriver> wait = new WebDriverWait(driver,30);
+		try {
+			wait.until(expectation);
+		} catch(Throwable error) {
+			new SelTestException("Timeout waiting for Page Load Request to complete.");
+		}
+	} 
+
+
+	public static List<WebElement> waitElementWithoutStale(WebDriver driver , List<WebElement> elements){
+		int i=0;
+		while(i< Integer.parseInt(Config.explictWaitMaxTimeout.getValue())){
+			try{
+				if(elements.get(elements.size()-1).isDisplayed())
+					return elements;
+			}catch(StaleElementReferenceException e){
+				StepUtil.simpleWait(1);
+			}finally{
+				i++;
+			}
+		}
+		return elements;
+
+	}
 	/**
 	 * Wait For a particular expected condition . <br/>
 	 * <b> Max Timeout depends on config properties <b/>
 	 * @see ExpectedConditions
 	 */
-	public static void waitElement(WebDriver driver ,ExpectedCondition<WebElement> expectedCondition){
-		WebDriverWait wait = new WebDriverWait(driver, Long.parseLong(Config.explictWait.getValue()));
-		wait.until(expectedCondition);
+	public static void waitElementVisible(WebDriver driver ,By by){
+		WebDriverWait wait = new WebDriverWait(driver,Integer.parseInt(Config.explictWaitMaxTimeout.getValue()));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(by));
 		wait.pollingEvery(1, TimeUnit.SECONDS);
 		wait.ignoring(NoSuchElementException.class);
+		wait.ignoring(StaleElementReferenceException.class);
+
+	}
+	public static void waitElementVisible(WebDriver driver,List<WebElement> elements){
+		WebDriverWait wait = new WebDriverWait(driver, Long.parseLong(Config.explictWaitMaxTimeout.getValue()));
+		wait.until(ExpectedConditions.visibilityOfAllElements(elements));
+		wait.pollingEvery(1, TimeUnit.SECONDS);
+		wait.ignoring(StaleElementReferenceException.class);
+		wait.ignoring(NoSuchElementException.class);
+	}
+
+	public static void waitElementVisible(WebDriver driver , By by , int time){
+		WebDriverWait wait = new WebDriverWait(driver,time);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(by));
+		wait.pollingEvery(1, TimeUnit.SECONDS);
+		wait.ignoring(NoSuchElementException.class);
+		wait.ignoring(StaleElementReferenceException.class);
 	}
 
 	/**
@@ -67,7 +118,7 @@ public class StepUtil {
 		driver.manage().timeouts().implicitlyWait(minWait, TimeUnit.SECONDS);
 
 	}
-	
+
 	/**
 	 * Switch to the window based on the title <br/>
 	 * Use <b>clickSwitch() </b> to switch to new window
@@ -77,7 +128,6 @@ public class StepUtil {
 	 * @exception IllegalArgumentException if both the title are same
 	 */
 	public static void windowSwitch(WebDriver driver,String title){
-		String testName = TestCase.getTestName();
 		Set<String> windows = driver.getWindowHandles();
 		String window=null;
 		Iterator<String> winItr = windows.iterator();
@@ -85,7 +135,7 @@ public class StepUtil {
 		if(driver.getTitle().equals(title)){ // Both have same title switch to 2nd
 			throw new IllegalArgumentException("Current Title and Swicth window title are same ");
 		}
-		log.info("		|<{}>	--(SWITCH WINDOW)	-> To Page : {}",testName,title);
+		logger.webLogger("		| (SWITCH WINDOW)	-> To Page : "+title);
 
 		while(winItr.hasNext()){
 			window = winItr.next();
@@ -101,9 +151,8 @@ public class StepUtil {
 	 * @param driver
 	 */
 	public static void windowClose(WebDriver driver){
-		String testName = TestCase.getTestName();
 		Set<String> windows = driver.getWindowHandles();
-		log.info("		|<{}>	-(CLOSE WINDOW)	-> Page Title : {}",testName,driver.getTitle());
+		logger.webLogger("		| (CLOSE WINDOW)	-> Page Title : "+driver.getTitle());
 		driver.close();
 		for(String window : windows){
 			driver.switchTo().window(window);
@@ -121,19 +170,27 @@ public class StepUtil {
 	 */
 	public static List<WebElement> getRow(WebDriver driver ,WebElement table , String unique){
 		int i=0;
-
+		String rowText = null;
 		while(true){
 			simpleWait(2);// TODO Need As findElements does not have explicit Wait
 			// Now get all the TR elements from the table 
-			List<WebElement> allRows = table.findElements(By.tagName("tr")); 
-			// And iterate over them, getting the cells 
-			for (WebElement row : allRows) { 
-				String rowText = row.getText();
-				if(rowText.contains(unique)){
-					List<WebElement> cells = row.findElements(By.tagName("td")); 
-					return cells;
+			try{
+				List<WebElement> allRows = table.findElements(By.tagName("tr")); 
+				// And iterate over them, getting the cells 
+				for (WebElement row : allRows) { 
+
+					rowText= row.getText();
+
+					if(rowText.contains(unique)){
+						List<WebElement> cells = row.findElements(By.tagName("td")); 
+						return cells;
+					}
 				}
+			}catch(StaleElementReferenceException ex){
+				reloadPage(driver);
+				i=0;
 			}
+
 			//Next Page
 			if(STEP.isPresent(By.linkText(((2+i)+"")), driver)){
 				driver.findElement(By.linkText((2+i)+"")).click();
@@ -159,14 +216,19 @@ public class StepUtil {
 		}
 	}
 
+	public static void reloadPage(WebDriver driver){
+		driver.navigate().refresh();
+		waitForPageLoaded(driver);
+	}
+
 	public static int getLatency(WebDriver driver){
 
 		return 0; //TODO GET LATENCY
 
 	}
-	
+
 	public static void acceptAlert(WebDriver driver){
-		StepUtil.simpleWait(3);
+		//	StepUtil.simpleWait(3);
 		driver.switchTo().alert().accept();
 	}
 

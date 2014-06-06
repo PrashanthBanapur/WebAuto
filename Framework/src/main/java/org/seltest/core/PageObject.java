@@ -20,8 +20,6 @@ public class PageObject {
 	 * <b> Note :Should Add Wait before return Url <b/>
 	 */
 	public String getUrl() {
-		System.out.println();
-		StepUtil.simpleWait(5);
 		return driver.getCurrentUrl().split("\\?")[0];// Remove parameters
 	}
 
@@ -32,7 +30,6 @@ public class PageObject {
 	 * @return
 	 */
 	public String getTitle() {
-		StepUtil.simpleWait(5);
 		return driver.getTitle();
 	}
 }

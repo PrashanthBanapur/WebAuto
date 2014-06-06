@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.testng.asserts.Assertion;
 import org.testng.asserts.IAssert;
 
-import atu.testng.reports.ATUReports;
 
 /**
  * @author adityas
@@ -41,7 +40,7 @@ public class HardAssertion extends Assertion {
 			ReportUtil.reportAssert("ASSERT SUCCESS", expected, actual);
 		}else if(msg!=null){
 			log.info("	(ASSERT SUCCESS) :- Message : {}  ",msg);
-			ATUReports.add("ASSERT SUCCESS",msg, true);
+			ReportUtil.reportAssert("ASSERT SUCCESS",msg, "");
 		}else {
 			log.info("	(ASSERT SUCCESS) ");
 			ReportUtil.reportAssert("ASSERT SUCCESS", "","");

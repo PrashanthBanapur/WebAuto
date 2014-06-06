@@ -24,7 +24,7 @@ public enum Config {
 	captureScreenshot,
 	waitType,
 	implicitWait,
-	explictWait,
+	explictWaitMaxTimeout,
 	dbDriver,
 	dbUrl,
 	dbUsername,
@@ -71,7 +71,7 @@ public enum Config {
 				log.warn(" Framework Wont work properly : eventfiring : {} ",val);
 			}
 			break;
-		case explictWait :
+		case explictWaitMaxTimeout :
 			break;
 		case fullscreen :
 			break;

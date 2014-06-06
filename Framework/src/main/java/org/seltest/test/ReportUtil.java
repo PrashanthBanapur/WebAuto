@@ -1,5 +1,6 @@
 package org.seltest.test;
 
+import org.openqa.selenium.WebDriver;
 import org.seltest.core.Config;
 import org.seltest.driver.DriverManager;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ public class ReportUtil {
 		if(screenShot.equals("all")||screenShot.equals("result")){
 			reportWithScreenshot(desp, msg1,msg2);
 		}else {
-			ATUReports.add(desp, msg1,msg2,false);
+			reportWithoutScreenShot(desp, msg1,msg2);
 		}
 
 	}
@@ -37,7 +38,7 @@ public class ReportUtil {
 		if(screenShot.equals("all")){
 			reportWithScreenshot(desp, msg1,msg2);
 		}else {
-			ATUReports.add(desp, msg1,msg2,false);
+			reportWithoutScreenShot(desp, msg1,msg2);
 		}
 
 	}
@@ -58,7 +59,7 @@ public class ReportUtil {
 		if(screenShot.equals("assertion")||screenShot.equals("all")||screenShot.equals("result")){
 			reportWithScreenshot(desp, expected,actual);
 		}else {
-			ATUReports.add(desp, expected,actual,false);
+			reportWithoutScreenShot(desp, expected, actual);
 		}
 	}
 
@@ -72,12 +73,26 @@ public class ReportUtil {
 		reportWithScreenshot(desp, msg1,msg2);
 	}
 
-	private synchronized  static void reportWithScreenshot(String msg1 , String msg2 , String msg3){
+	private static void reportWithoutScreenShot(String msg1,String msg2,String msg3){
 		try{
-			ATUReports.setWebDriver(DriverManager.getDriver());
-			ATUReports.add(msg1, msg2,msg3,true);
+			ATUReports.add(msg1, msg2,msg3,false);
 		}catch(Exception e){
-			log.debug("Could Not Capture Screen Shot for Step : {} {} {} ",msg1,msg2,msg3);
+			// TODO
+		}
+	}
+
+	private static void reportWithScreenshot(String msg1 , String msg2 , String msg3){
+		WebDriver driver = DriverManager.getDriver();
+		if(driver==null){
+			reportWithoutScreenShot(msg1, msg2, msg3);
+		}else{
+
+			try{
+			ATUReports.setWebDriver(driver);
+			ATUReports.add(msg1, msg2,msg3,true);
+			}catch(Exception e){
+				log.info("Screen Shot not captured : "+msg2);
+			}
 		}
 	}
 

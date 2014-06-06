@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
@@ -28,7 +29,7 @@ public class Step {
 		option.selectByVisibleText(val);
 	}
 
-	
+
 	/**
 	 * Click on a Checkbox by finding using css
 	 * @param element WebElement which has check box
@@ -36,7 +37,7 @@ public class Step {
 	public void Checkboxclick(WebElement element) {
 		element.findElement(By.cssSelector("input[type='checkbox']")).click();;
 	}
-	
+
 	/**
 	 * Click on a Checkbox only if its not selected
 	 * @param element WebElement which has check box
@@ -51,7 +52,7 @@ public class Step {
 	 * Get the Text selected in a drop down list
 	 * @param ddList List to find the text      
 	 */
-	public static String getSelectedText(WebElement ddList){
+	public String getSelectedText(WebElement ddList){
 		Select option = new Select(ddList);
 		return option.getFirstSelectedOption().getText();
 	}
@@ -73,26 +74,27 @@ public class Step {
 	 */
 	public void click(WebElement element) {
 		element.click();
+		StepUtil.waitForPageLoaded(DriverManager.getDriver());
 	}
-	
+
 	/**
 	 * Click on a WebElement and switch to the new Window
 	 * @param element
 	 */
 	public void clickAndSwitch(WebElement element){
-		
+
 		WebDriver driver = DriverManager.getDriver();
 		String winHandleBefore = driver.getWindowHandle();
-		element.click();
+		click(element);
 		Set<String> windows = driver.getWindowHandles();
-		
+
 		for(String window : windows){
 			if(!window.equals(winHandleBefore)){
 				driver.switchTo().window(window);
 			}
 		}
 	}
-	
+
 
 	/**
 	 * 
@@ -100,13 +102,13 @@ public class Step {
 	 * @param val Unique button value
 	 */
 	public void clickRadioButton(List<WebElement> lstRadioButton, String val) {
-		
+
 		for(WebElement radioBtn : lstRadioButton){
 			if(radioBtn.getAttribute("value").equals(val)){
 				radioBtn.click();
 			}
 		}
-		
+
 	}
 
 	/**
@@ -115,12 +117,30 @@ public class Step {
 	 * @return Text in the field
 	 */
 	public String getText(WebElement element) {
-		String value = element.getAttribute("value");
-		if(value!= null){
-			return value;
-		}else{
-			return element.getText();
+		
+		int i =0;
+		while(i<Integer.parseInt(Config.explictWaitMaxTimeout.getValue())){
+			try{
+				String value = element.getAttribute("value");
+				String text = element.getText();
+				if(value == null && text ==null ){
+					StepUtil.simpleWait(1);
+				}else if(value != null){				
+					return value;
+				}else if(text != null){
+					return element.getText();
+				}
+			}catch(StaleElementReferenceException e){
+				StepUtil.simpleWait(1);
+				if(i%10==0){
+					WebDriver driver =DriverManager.getDriver();
+					StepUtil.reloadPage(driver);
+				}
+			}finally{
+				++i;
+			}
 		}
+		throw new SelTestException("Unable to Get Element Text "+element);
 	}
 
 	/**
