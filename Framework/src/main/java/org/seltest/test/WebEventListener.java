@@ -1,43 +1,61 @@
 package org.seltest.test;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.concurrent.TimeUnit;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.AbstractWebDriverEventListener;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.seltest.core.Config;
 import org.seltest.core.StepUtil;
-import org.seltest.core.TestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WebEventListener extends AbstractWebDriverEventListener {
 
 	private final Logger log = LoggerFactory.getLogger("STEP");
-	private static final int MIN_WAIT=3; // Imp don't reduce the time unless you are sure
+	//	private static final int MIN_WAIT=3; // Imp don't reduce the time unless you are sure
 	private static final String WAIT_TYPE = Config.waitType.getValue();
 	private static final int IMPLICIT_WAIT_TIME = Integer.parseInt(Config.implicitWait.getValue());
+	private static final int MAX_EXPLICIT_WAIT = Integer.parseInt(Config.explictWaitMaxTimeout.getValue());
+	private static final LoggerUtil logger = LoggerUtil.getLogger();
 
 
 	public void afterClickOn(WebElement element , WebDriver driver){
 		//Implicit Wait 
 		if(WAIT_TYPE.equals("implicit")){
 			StepUtil.simpleWait(IMPLICIT_WAIT_TIME);
-		}else{
-			StepUtil.simpleWait(MIN_WAIT);
 		}
+		//		else{
+		//			StepUtil.simpleWait(MIN_WAIT);
+		//		}
 	}
 	public void beforeFindBy(By by, WebElement element, WebDriver driver) {
+		int i=0;
 		if(WAIT_TYPE.equals("explicit")){
-			StepUtil.waitElement(driver,ExpectedConditions.visibilityOfElementLocated(by));
+			while(i<MAX_EXPLICIT_WAIT){
+				try{
+					StepUtil.waitElementVisible(driver,by,5);
+					break;
+				}catch(TimeoutException ex){
+					StepUtil.reloadPage(driver);
+				}finally{
+					i=i+5;
+				}
+			}
 		}
 	}
 
 
 	public void afterNavigateTo(String url, WebDriver driver) {
-		log.info("		|<{}>	-(NAVIGATE)	-> To Url : {}",getTestName(),url);
-		StepUtil.simpleWait(MIN_WAIT);
+		logger.webLogger("(NAVIGATE)	-> To Url : "+url);
+		//		StepUtil.simpleWait(MIN_WAIT);
+		driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
 		ReportUtil.reportWebStep("GO TO ", url , "");
 	}
 
@@ -48,7 +66,7 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		}else{
 			elementValue=element.getText();
 		}
-		log.info("		|<{}>	-(CLICK ON)	-> Element = '{}' ",getTestName(),elementValue);
+		logger.webLogger("(CLICK ON)	-> Element = '"+elementValue+"'");
 		String border =StepUtil.highlightElement(driver, element);
 		ReportUtil.reportWebStep("CLICK",elementValue,"");
 		StepUtil.unhighlightElement(driver, element,border);
@@ -61,11 +79,11 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		String elemId = element.getAttribute("id");
 		String border=StepUtil.highlightElement(driver, element);
 		if(elemId.length()>3){
-			log.info("		|<{}>	-(CHANGED)	-> Element = '{}' New Value = '{}' ",getTestName(),elemId,elemValue);
+			logger.webLogger("(CHANGED)	-> Element = '"+elemId+"' New Value = '"+elemValue+"'");
 			ReportUtil.reportWebStep("CHANGED",elemId,elemValue);
 
 		}else{
-			log.info("		|<{}>	-(CHANGED)	-> Element = '{}' New Value = '{}' ",getTestName(),elemName,elemValue);
+			logger.webLogger("(CHANGED)	-> Element = '"+elemName+"' New Value = '"+elemValue+"'");
 			ReportUtil.reportWebStep("CHANGED",elemId,elemValue);
 		}
 		StepUtil.unhighlightElement(driver, element,border);
@@ -77,27 +95,27 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		String elemName = element.getAttribute("name");
 		String elemId = element.getAttribute("id");
 		if(elemId.length()>3){
-			log.info("		|<{}>	-(CHANGING)	-> Element = '{}' Old Value = '{}' ",getTestName(),elemId,elemValue);
+			logger.webLogger("(CHANGING)	-> Element = '"+elemId+"' Old Value = '"+elemValue+"' ");
 		}else {
-			log.info("		|<{}>	-(CHANGING)	-> Element = '{}' Old Value = '{}' ",getTestName(),elemName,elemValue);
+			logger.webLogger("(CHANGING)	-> Element = '"+elemName+"' Old Value = '"+elemValue+"' ");
 
 		}
 	}
 
 
 	public void onException(Throwable throwable, WebDriver driver) {
-		if(!(throwable instanceof NoSuchElementException) ){
-			log.error("		|<{}>	-(EXCEPTION) 	-> Message = {} ",getTestName(),throwable.getLocalizedMessage());
+		if((throwable instanceof NoSuchElementException) || (throwable instanceof StaleElementReferenceException)){
+			logger.webLogger("( HANDLED EXCEPTION) 	-> Message = "+throwable.getClass());
+		}
+		else{
+			logger.webLogger("(EXCEPTION) 	-> Message = "+throwable.getLocalizedMessage()+" ");
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			throwable.printStackTrace(pw);
+			log.error(sw.toString()); // stack trace as a string
 			ReportUtil.reportException("EXCEPTION", throwable.getLocalizedMessage().substring(0, 50), "");// TODO Make it Small message
 		}
 	}
 
-	private String getTestName(){
-		String name = TestCase.getTestName();
-		if(name!=null)
-			return name;
-		else
-			return "config";
-	}
 
 }

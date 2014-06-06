@@ -1,17 +1,29 @@
 Web Auto
 ==========
+
+-------------------------------------------
+Version 2.0
+-------------------------------------------
+Feature Added : 
+Major : 
+1. JDBC Connection and Database validation
+
+
 -------------------------------------------
 Version 1.0
 -------------------------------------------
 1. Stable Release . 
 
+-------------------------------------------
+Version 0.3.0 
+-------------------------------------------
+1. Major Change in api added Step Class
 
--------------------------------------------
+--------------------------------------------
 Version 0.2.0
--------------------------------------------
-Feature Added : 
-Major : 
-1. JDBC Connection and Database validation
+--------------------------------------------
+1. Added @TestInfo For Added Test Case details
+2. Added Option to Highlight WebElements
 
 
 -------------------------------------------

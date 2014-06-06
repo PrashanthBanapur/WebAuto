@@ -20,7 +20,7 @@ public class HomePage extends PageObject {
 	}
 	
 	public SignOnPage clickSignOn(){
-		lnkSignOn.click();
+		step.click(lnkSignOn);
 		return PageFactory.initElements(driver, SignOnPage.class);
 	}
 
