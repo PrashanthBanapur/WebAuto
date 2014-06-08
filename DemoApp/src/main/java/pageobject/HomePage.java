@@ -6,8 +6,9 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.seltest.core.Config;
 import org.seltest.core.PageObject;
+import org.seltest.core.StartState;
 
-public class HomePage extends PageObject {
+public class HomePage extends PageObject implements StartState{
 
 	public static final String URL = Config.baseUrl.getValue()+"mercurywelcome.php";
 	@FindBy(linkText="SIGN-ON")
@@ -28,6 +29,18 @@ public class HomePage extends PageObject {
 
 	public void clickSignOff() {
 		step.click(lnkSignOff);
+		
+	}
+
+	@Override
+	public Boolean isStartState() {
+		step.isDisplayed(lnkSignOn);
+		return null;
+	}
+
+	@Override
+	public void goToStartPage() {
+		// TODO Auto-generated method stub
 		
 	}
 

@@ -157,25 +157,45 @@ public class Step {
 	 * @see WebElement
 	 */
 	public boolean isDisplayed(WebElement element) {
-		return false;
-		// TODO implement without calling event firing
+		WebDriver driver = DriverManager.getDriver();
+		WebDriver simpleDriver = getSimpleDriver(driver);
+		String value = getValue(element);
+		By by = getBy(element,value);
+		if(simpleDriver.findElement(by).isDisplayed()){
+			return true;
+		}else{
+			return false;
+		}
 	}
 
+	
 	/**
 	 * Verify if an Element is Enabled
 	 * @param element
 	 * @see WebElement
 	 */
 	public boolean isEnabled(WebElement element) {
-		return false;
-		// TODO implement without calling event firing
-
+		WebDriver driver = DriverManager.getDriver();
+		WebDriver simpleDriver = getSimpleDriver(driver);
+		String value = getValue(element);
+		By by = getBy(element,value);
+		if(simpleDriver.findElement(by).isEnabled()){
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	public boolean isSelected(WebElement element) {
-		return false;
-		// TODO implement without calling event firing
-
+		WebDriver driver = DriverManager.getDriver();
+		WebDriver simpleDriver = getSimpleDriver(driver);
+		String value = getValue(element);
+		By by = getBy(element,value);
+		if(simpleDriver.findElement(by).isSelected()){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	/**
 	 * Check if WebElement is present in the page
@@ -217,6 +237,41 @@ public class Step {
 	 */
 	public void submit(WebElement element) {
 		element.submit();
+	}
+
+	private WebDriver getSimpleDriver(WebDriver driver){
+		WebDriver simpleDriver = driver;
+		if(driver instanceof EventFiringWebDriver){
+			EventFiringWebDriver eventFirDriver = (EventFiringWebDriver)driver;
+			simpleDriver = eventFirDriver.getWrappedDriver();
+		}
+		return simpleDriver;
+	}
+	
+	private String getValue(WebElement element){
+		String elementType =element.toString();
+		int valueBeginIndex = elementType.lastIndexOf(':')+2;
+		int valueEndIndex = elementType.lastIndexOf(']');
+		String value = elementType.substring(valueBeginIndex, valueEndIndex);
+		return value;
+	}
+	
+	private By getBy(WebElement element,String value) {
+		String elementType = element.toString();
+		if(elementType.contains("partial link text")){
+			return By.partialLinkText(value);
+		}else if(elementType.contains("link text")){
+			return By.linkText(value);
+		}else if(elementType.contains("id")){
+			return By.id(value);
+		}else if(elementType.contains("name")){
+			return By.name(value);
+		}else if(elementType.contains("xpath")){
+			return By.xpath(value);
+		}else if(elementType.contains("class name")){
+			return By.className(value);
+		}else
+			return null;
 	}
 
 }

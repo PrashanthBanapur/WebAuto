@@ -2,6 +2,7 @@ package testcase;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
+import org.seltest.core.StartState;
 import org.seltest.driver.DriverManager;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -17,6 +18,9 @@ public class Tests {
 		driver = DriverManager.getDriver();
 		driver.get(HomePage.URL);
 		home = PageFactory.initElements(driver, HomePage.class);
+		StartState state = home;
+		state.isStartState();
+		
 	}
 
 	@AfterMethod
