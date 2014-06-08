@@ -157,32 +157,25 @@ public class Step {
 	 * @see WebElement
 	 */
 	public boolean isDisplayed(WebElement element) {
-		if(element.isDisplayed()){
-			return true;
-		} else{
-			return false;
-		}
+		return false;
+		// TODO implement without calling event firing
 	}
 
 	/**
-	 * Veirfy if an Element is Enabled
+	 * Verify if an Element is Enabled
 	 * @param element
 	 * @see WebElement
 	 */
 	public boolean isEnabled(WebElement element) {
-		if(element.isEnabled()){
-			return true;
-		}else {
-			return false;
-		}
+		return false;
+		// TODO implement without calling event firing
+
 	}
 
 	public boolean isSelected(WebElement element) {
-		if(element.isSelected()){
-			return true;
-		}else {
-			return false;
-		}
+		return false;
+		// TODO implement without calling event firing
+
 	}
 	/**
 	 * Check if WebElement is present in the page
@@ -225,9 +218,5 @@ public class Step {
 	public void submit(WebElement element) {
 		element.submit();
 	}
-
-
-
-
 
 }

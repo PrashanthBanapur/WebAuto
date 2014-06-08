@@ -27,7 +27,7 @@ import org.testng.SkipException;
  * All the Methods for executing Test Steps which are not provided by Webdriver
  */
 public class StepUtil {
-	//private static final Logger log = LoggerFactory.getLogger("STEP");
+	
 	private static final LoggerUtil logger = LoggerUtil.getLogger();
 	private static final Step STEP= new Step();
 
@@ -92,13 +92,6 @@ public class StepUtil {
 		wait.ignoring(NoSuchElementException.class);
 		wait.ignoring(StaleElementReferenceException.class);
 
-	}
-	public static void waitElementVisible(WebDriver driver,List<WebElement> elements){
-		WebDriverWait wait = new WebDriverWait(driver, Long.parseLong(Config.explictWaitMaxTimeout.getValue()));
-		wait.until(ExpectedConditions.visibilityOfAllElements(elements));
-		wait.pollingEvery(1, TimeUnit.SECONDS);
-		wait.ignoring(StaleElementReferenceException.class);
-		wait.ignoring(NoSuchElementException.class);
 	}
 
 	public static void waitElementVisible(WebDriver driver , By by , int time){
