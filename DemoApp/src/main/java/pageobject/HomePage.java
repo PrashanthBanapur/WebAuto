@@ -34,14 +34,17 @@ public class HomePage extends PageObject implements StartState{
 
 	@Override
 	public Boolean isStartState() {
-		step.isDisplayed(lnkSignOn);
-		return null;
+		if(step.isDisplayed(lnkSignOn)){
+			return true;
+		}else{
+			return false;
+		}
+		
 	}
 
 	@Override
 	public void goToStartPage() {
-		// TODO Auto-generated method stub
-		
+		step.click(lnkSignOff);
 	}
 
 }

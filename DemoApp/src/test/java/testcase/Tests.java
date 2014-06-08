@@ -19,7 +19,9 @@ public class Tests {
 		driver.get(HomePage.URL);
 		home = PageFactory.initElements(driver, HomePage.class);
 		StartState state = home;
-		state.isStartState();
+		if(!state.isStartState()){
+			state.goToStartPage();
+		}
 		
 	}
 
