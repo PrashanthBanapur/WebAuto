@@ -15,9 +15,23 @@ Version 1.0
 1. Stable Release . 
 
 -------------------------------------------
+Version 0.4.0
+-------------------------------------------
+1. Better Logging
+2. Better reporting
+
+-------------------------------------------
 Version 0.3.0 
 -------------------------------------------
 1. Major Change in api added Step Class
+2. Improved getText and getRow api
+3. Fixed Following exceptions 
+	i. StaleReferene Exception
+	ii.TimeOutExcpetion waiting for element
+	iii. Firefox driver called after quit()
+	iv. AlertNotPresent Exception
+4. Improved Explicit wait execution time
+5. Reducing use of thread.sleep scenarios
 
 --------------------------------------------
 Version 0.2.0
