@@ -16,7 +16,7 @@ public class LoggerUtil {
 	private static LoggerUtil logger = new LoggerUtil();
 	private final Logger step = LoggerFactory.getLogger("STEP");
 	private final Logger test = LoggerFactory.getLogger("TEST");
-	private final Logger log = LoggerFactory.getLogger(LoggerUtil.class);
+	private final Logger log = LoggerFactory.getLogger("LOG");
 	
 	// Cannot Create instance
 	private LoggerUtil(){
@@ -76,11 +76,11 @@ public class LoggerUtil {
 	
 	public void info(String format , Object ... arguments ){
 		format = "|T="+Thread.currentThread().getId()+" :	"+format;
-		log.info(format,Thread.currentThread().getId(), arguments);
+		log.info(format, arguments);
 	}
 	public void debug(String format , Object ... arguments){
 		format = "|T="+Thread.currentThread().getId()+" :	"+format;
-		log.debug(format, Thread.currentThread().getId(),arguments);
+		log.debug(format,arguments);
 	}
 	public void warn(String format , Object ... arguments){
 		format = "|T="+Thread.currentThread().getId()+" :	"+format;

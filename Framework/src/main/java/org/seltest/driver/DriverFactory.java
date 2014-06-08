@@ -8,17 +8,17 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.seltest.core.Config;
+import org.seltest.test.LoggerUtil;
 import org.seltest.test.WebEventListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 final class DriverFactory {
 
-	private static Logger log = LoggerFactory.getLogger(DriverFactory.class);
 	private static String browser;
 	private static String driverPath;
 	private static Boolean eventFiring;
 	private static Boolean fullscreen;
+	private static final LoggerUtil logger = LoggerUtil.getLogger();
 
 	static{
 		browser = Config.browser.getValue();
@@ -35,21 +35,17 @@ final class DriverFactory {
 		WebDriver driver=null;
 		if(browser.equalsIgnoreCase("FIREFOX")){
 			driver = new FirefoxDriver();
-			log.debug("Firefox Driver Created : {}" ,driver);
 
 		}else if(browser.equalsIgnoreCase("CHROME")){			
 			System.setProperty("webdriver.chrome.driver", driverPath+"/chromedriver.exe");
 			driver = new ChromeDriver();
-			log.debug("Chrome Driver Created : {}" ,driver);
 
 		}else if(browser.equalsIgnoreCase("ANDROID")){
 			driver = new RemoteWebDriver(DesiredCapabilities.android());
-			log.debug("Android Driver Created : {}" ,driver);
 
 		}else if(browser.equalsIgnoreCase("IE")){
 			System.setProperty("webdriver.ie.driver", driverPath+"/iedriver.exe");
 			driver = new InternetExplorerDriver();
-			log.debug("IE Driver Created : {}" ,driver);
 		}
 		// Adding Web Event Listner
 		if(eventFiring){
@@ -58,7 +54,7 @@ final class DriverFactory {
 			driver = efirDriver.register(driverListner);
 		}
 		else {
-			log.warn("FrameWork Wont Work Properly : 'Event Firing' Set To : '{}'",eventFiring);
+			logger.warn("FrameWork Wont Work Properly : 'Event Firing' Set To : '{}'",eventFiring);
 		}
 		
 		if(fullscreen){

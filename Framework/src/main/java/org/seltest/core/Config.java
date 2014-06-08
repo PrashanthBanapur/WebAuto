@@ -45,7 +45,7 @@ public enum Config {
 	public String getValue() {
 		if (value == null) {
 			init();
-			logger.debug("Config : {} Value : {} returned : ",value,this);
+			logger.debug("Config : '{}' Value : '{}' ",this.name(),value);
 		}
 		return value;
 	}
