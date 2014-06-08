@@ -31,7 +31,7 @@ public enum Config {
 	dbPassword,	
 	;
 
-	private static final String PATH = "webapp.properties";
+	private static final String PATH = "config.properties";
 	private static final Logger log = LoggerFactory.getLogger(Config.class);
 	private static Properties property;
 	private String value;
