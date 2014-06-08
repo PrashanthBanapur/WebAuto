@@ -132,7 +132,7 @@ public class Step {
 				}
 			}catch(StaleElementReferenceException e){
 				StepUtil.simpleWait(1);
-				if(i%10==0){
+				if(i%10==0&& i>1){
 					WebDriver driver =DriverManager.getDriver();
 					StepUtil.reloadPage(driver);
 				}

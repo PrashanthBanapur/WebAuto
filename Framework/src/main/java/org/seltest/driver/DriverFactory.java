@@ -25,6 +25,8 @@ final class DriverFactory {
 		driverPath=Config.driverPath.getValue();
 		eventFiring=Boolean.parseBoolean(Config.eventfiring.getValue());
 		fullscreen=Boolean.parseBoolean(Config.fullscreen.getValue());
+		System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
+		System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "warn");
 	}
 	/**
 	 * Method to get WebDriver based on app properties
