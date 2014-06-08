@@ -172,7 +172,6 @@ public class Step {
 	/**
 	 * Verify if an Element is Enabled
 	 * @param element
-	 * @see WebElement
 	 */
 	public boolean isEnabled(WebElement element) {
 		WebDriver driver = DriverManager.getDriver();
@@ -186,6 +185,10 @@ public class Step {
 		}
 	}
 
+	/**
+	 * Verifyy if an Element is Selected
+	 * @param element
+	 */
 	public boolean isSelected(WebElement element) {
 		WebDriver driver = DriverManager.getDriver();
 		WebDriver simpleDriver = getSimpleDriver(driver);
