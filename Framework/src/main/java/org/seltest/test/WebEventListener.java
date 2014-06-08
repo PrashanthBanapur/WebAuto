@@ -53,7 +53,7 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 
 
 	public void afterNavigateTo(String url, WebDriver driver) {
-		logger.webLogger("(NAVIGATE)	-> To Url : "+url);
+		logger.web("(NAVIGATE)	-> To Url : "+url);
 		//		StepUtil.simpleWait(MIN_WAIT);
 		driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
 		ReportUtil.reportWebStep("GO TO ", url , "");
@@ -66,7 +66,7 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		}else{
 			elementValue=element.getText();
 		}
-		logger.webLogger("(CLICK ON)	-> Element = '"+elementValue+"'");
+		logger.web("(CLICK ON)	-> Element = '"+elementValue+"'");
 		String border =StepUtil.highlightElement(driver, element);
 		ReportUtil.reportWebStep("CLICK",elementValue,"");
 		StepUtil.unhighlightElement(driver, element,border);
@@ -79,11 +79,11 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		String elemId = element.getAttribute("id");
 		String border=StepUtil.highlightElement(driver, element);
 		if(elemId.length()>3){
-			logger.webLogger("(CHANGED)	-> Element = '"+elemId+"' New Value = '"+elemValue+"'");
+			logger.web("(CHANGED)	-> Element = '"+elemId+"' New Value = '"+elemValue+"'");
 			ReportUtil.reportWebStep("CHANGED",elemId,elemValue);
 
 		}else{
-			logger.webLogger("(CHANGED)	-> Element = '"+elemName+"' New Value = '"+elemValue+"'");
+			logger.web("(CHANGED)	-> Element = '"+elemName+"' New Value = '"+elemValue+"'");
 			ReportUtil.reportWebStep("CHANGED",elemId,elemValue);
 		}
 		StepUtil.unhighlightElement(driver, element,border);
@@ -95,9 +95,9 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		String elemName = element.getAttribute("name");
 		String elemId = element.getAttribute("id");
 		if(elemId.length()>3){
-			logger.webLogger("(CHANGING)	-> Element = '"+elemId+"' Old Value = '"+elemValue+"' ");
+			logger.web("(CHANGING)	-> Element = '"+elemId+"' Old Value = '"+elemValue+"' ");
 		}else {
-			logger.webLogger("(CHANGING)	-> Element = '"+elemName+"' Old Value = '"+elemValue+"' ");
+			logger.web("(CHANGING)	-> Element = '"+elemName+"' Old Value = '"+elemValue+"' ");
 
 		}
 	}
@@ -105,10 +105,10 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 
 	public void onException(Throwable throwable, WebDriver driver) {
 		if((throwable instanceof NoSuchElementException) || (throwable instanceof StaleElementReferenceException)){
-			logger.webLogger("( HANDLED EXCEPTION) 	-> Message = "+throwable.getClass());
+			logger.web("( HANDLED EXCEPTION) 	-> Message = "+throwable.getClass());
 		}
 		else{
-			logger.webLogger("(EXCEPTION) 	-> Message = "+throwable.getLocalizedMessage()+" ");
+			logger.web("(EXCEPTION) 	-> Message = "+throwable.getLocalizedMessage()+" ");
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			throwable.printStackTrace(pw);

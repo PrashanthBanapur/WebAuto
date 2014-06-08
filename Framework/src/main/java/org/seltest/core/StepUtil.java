@@ -39,7 +39,7 @@ public class StepUtil {
 	 * @param Time in seconds
 	 */
 	public static void simpleWait(int minWait){
-		logger.webLogger("		|-(SIMPLE WAIT)	-> TIME = "+minWait+" sec ");
+		logger.debug("(SIMPLE WAIT)	-> TIME = "+minWait+" sec ");
 		try {
 			Thread.sleep(minWait*1000);
 		} catch (InterruptedException e) {
@@ -135,7 +135,7 @@ public class StepUtil {
 		if(driver.getTitle().equals(title)){ // Both have same title switch to 2nd
 			throw new IllegalArgumentException("Current Title and Swicth window title are same ");
 		}
-		logger.webLogger("		| (SWITCH WINDOW)	-> To Page : "+title);
+		logger.web(" (SWITCH WINDOW)	-> To Page : "+title);
 
 		while(winItr.hasNext()){
 			window = winItr.next();
@@ -152,7 +152,7 @@ public class StepUtil {
 	 */
 	public static void windowClose(WebDriver driver){
 		Set<String> windows = driver.getWindowHandles();
-		logger.webLogger("		| (CLOSE WINDOW)	-> Page Title : "+driver.getTitle());
+		logger.web(" (CLOSE WINDOW)	-> Page Title : "+driver.getTitle());
 		driver.close();
 		for(String window : windows){
 			driver.switchTo().window(window);

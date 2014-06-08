@@ -16,24 +16,31 @@ public class LoggerUtil {
 	private static LoggerUtil logger = new LoggerUtil();
 	private final Logger step = LoggerFactory.getLogger("STEP");
 	private final Logger test = LoggerFactory.getLogger("TEST");
+	private final Logger log = LoggerFactory.getLogger(LoggerUtil.class);
 	
 	// Cannot Create instance
 	private LoggerUtil(){
 	}
 	
-	public void webLogger(String msg){
+	public static LoggerUtil getLogger(){
+		return logger;
+	}
+	
+
+	
+	public void web(String msg){
 		step.info(" |T={}:		|[D={}]	 |-<{}>	-{}",Thread.currentThread().getId(),DriverManager.getDriver().hashCode(),getTestName(),msg);
 	}
 	
-	public void testLogger(String msg ) {
+	public void test(String msg ) {
 		test.info(" |T={}: {} {}",Thread.currentThread().getId(),msg,getTestName());
 	}
 	
-	public void testLogger(String msg , String arg){
+	public void test(String msg , String arg){
 		test.info(" |T={}: {} {}",Thread.currentThread().getId(),msg,arg);
 	}
 	
-	public void exceptionLogger(Throwable throwable){
+	public void exception(Throwable throwable){
 		step.error("(EXCEPTION) 	-> Message = "+throwable.getLocalizedMessage()+" ");
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
@@ -41,7 +48,7 @@ public class LoggerUtil {
 		step.info(sw.toString()); // stack trace as a string
 	}
 	
-	public void assertionLogger(String status ,IAssert assertCommand){
+	public void assertion(String status ,IAssert assertCommand){
 		String expected = assertCommand.getExpected().toString();
 		String actual = assertCommand.getActual().toString();
 		String msg = assertCommand.getMessage();
@@ -59,10 +66,6 @@ public class LoggerUtil {
 		
 	}
 	
-	public void infoLogger(String msg){
-		test.info("|T={} :	{}",Thread.currentThread().getId(),msg);
-	}
-	
 	private String getTestName(){
 		String name = TestCase.getTestName();
 		if(name!=null)
@@ -71,9 +74,17 @@ public class LoggerUtil {
 			return "config";
 	}
 	
-	public static LoggerUtil getLogger(){
-		return logger;
+	public void info(String format , Object ... arguments ){
+		format = "|T="+Thread.currentThread().getId()+" :	"+format;
+		log.info(format,Thread.currentThread().getId(), arguments);
+	}
+	public void debug(String format , Object ... arguments){
+		format = "|T="+Thread.currentThread().getId()+" :	"+format;
+		log.debug(format, Thread.currentThread().getId(),arguments);
+	}
+	public void warn(String format , Object ... arguments){
+		format = "|T="+Thread.currentThread().getId()+" :	"+format;
+		log.warn(format, arguments);
 	}
 	
-
 }

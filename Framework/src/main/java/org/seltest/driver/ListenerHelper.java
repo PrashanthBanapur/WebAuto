@@ -32,65 +32,60 @@ public class ListenerHelper {
 
 	public void onTestStart(ITestResult result) {
 		TestCase.setTestName(result.getName());
-		logger.testLogger("	(START)	-> Test Case : ");
+		logger.test("	(START)	-> Test Case : ");
 		processAnnotation(result);
 
 	}
 
 	public void onTestSuccess(ITestResult result) {
 		//test.info("	(SUCCESS)	-> Test Case : {} ",result.getName());
-		logger.testLogger("	(SUCCESS)	-> Test Case : ");
+		logger.test("	(SUCCESS)	-> Test Case : ");
 		setTestInfo();
 		ReportUtil.reportResult("SUCCESS", result.getName(), "");
 	}
 
 	public void onTestFailure(ITestResult result) {
-		logger.testLogger("	(FAIL)	-> Test Case : ");
+		logger.test("	(FAIL)	-> Test Case : ");
 		setTestInfo();
 		ReportUtil.reportResult("FAIL", result.getName(), "");
 
 	}
 
 	public void onTestSkipped(ITestResult result) {
-		logger.testLogger("	(SKIPPED)	-> Test Case : ");
+		logger.test("	(SKIPPED)	-> Test Case : ");
 		setTestInfo();
 		ReportUtil.reportResult("SKIP", result.getName(), "");
 
 	}
 
 	public void beforeConfiguration(ITestResult result) {
-		logger.testLogger("	(START)	-> Config Name : ");
+		logger.test("	(START)	-> Config Name : ");
 	}
 
 	public void onConfigurationFailure(ITestResult result){
-		logger.testLogger("	(FAIL)	-> Config Name : ");
+		logger.test("	(FAIL)	-> Config Name : ");
 	}
 
 	public void onConfigurationSkip(ITestResult result){
-		logger.testLogger("	(SKIPPED)	-> Config Name : ");
+		logger.test("	(SKIPPED)	-> Config Name : ");
 	}
 
 	public void onConfigurationSuccess(ITestResult result){
-		logger.testLogger("	(SUCCESS)	-> Config Name : ");
+		logger.test("	(SUCCESS)	-> Config Name : ");
 	}
 
 	public void onStart(ITestContext context) {
-		logger.testLogger("	(START)	 -> Tests Name : ",context.getName()); 
+		logger.test("	(START)	 -> Tests Name : ",context.getName()); 
 		if(parallelMode.equals("tests")){
 			createWebDriver();
-		}else{
-			logger.testLogger("(SINGLE) -> !!! Browser Execution");
 		}
 	}
 
 	public void onFinish(ITestContext context) {
-		logger.testLogger("	(FINISHED)	 -> Tests Name : ",context.getName()); 
+		logger.test("	(FINISHED)	 -> Tests Name : ",context.getName()); 
 		if(parallelMode.equals("tests")){
 			quitWebDriver();
-		}else{
-			logger.testLogger("(SINGLE) -> !!! Browser Execution");
 		}
-
 	}
 
 	public void onStart(ISuite suite) {
@@ -98,9 +93,9 @@ public class ListenerHelper {
 		parallelMode=suite.getParallel().toLowerCase();// Get parallel mode
 
 		if(!suiteCalled){
-			logger.infoLogger("");
-			logger.infoLogger("	******* STARTED "+suite.getName().toUpperCase()+" ******");
-			logger.infoLogger("	");
+			logger.info("");
+			logger.info("	******* STARTED "+suite.getName().toUpperCase()+" ******");
+			logger.info("");
 			String path = new File("./","src/main/resources/atu.properties").getAbsolutePath();
 			System.setProperty("atu.reporter.config", path);
 			if(!parallelMode.equals("tests")){ // Only Tests supported
@@ -112,9 +107,9 @@ public class ListenerHelper {
 
 	public void onFinish(ISuite suite) {
 		if(suiteCalled){
-			logger.infoLogger("	");
-			logger.infoLogger("	****** FINISHED "+suite.getName().toUpperCase()+" ******");
-			logger.infoLogger("	");
+			logger.info("");
+			logger.info("	****** FINISHED "+suite.getName().toUpperCase()+" ******");
+			logger.info("");
 			if(!parallelMode.equals("tests")){
 				quitWebDriver();
 			}
@@ -125,10 +120,10 @@ public class ListenerHelper {
 	private void createWebDriver(){
 		
 		WebDriver driver = DriverFactory.getDriver();
-		logger.infoLogger("Driver Created : "+driver);
+		logger.debug("Driver Created : "+driver);
 		if(driver==null){
 			driver = DriverFactory.getDriver();
-			logger.infoLogger("(RETRYING TO SET DRIVER ");
+			logger.debug("(RETRYING TO SET DRIVER ");
 		}
 		DriverManager.setWebDriver(driver);		
 
@@ -136,7 +131,7 @@ public class ListenerHelper {
 
 	private void quitWebDriver(){
 		WebDriver driver = DriverManager.getDriver();
-		logger.infoLogger(" Driver Going to Quit "+driver);
+		logger.debug(" Driver Going to Quit "+driver);
 		if (driver != null) {
 			driver.quit();
 		}

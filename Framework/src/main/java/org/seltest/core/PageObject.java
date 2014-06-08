@@ -1,8 +1,7 @@
 package org.seltest.core;
 
 import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.seltest.test.LoggerUtil;
 
 /**
  * Super class for all Page Object <br/>
@@ -12,11 +11,11 @@ import org.slf4j.LoggerFactory;
  */
 public class PageObject {
 	protected WebDriver driver;
-	private final Logger log = LoggerFactory.getLogger(PageObject.class);
+	private final LoggerUtil logger = LoggerUtil.getLogger();
 	protected final static Step step = new Step();
 
 	public PageObject(WebDriver driver){
-		log.debug("Created Page Object on Driver : {} ",driver.hashCode());
+		logger.debug("Created Page Object on Driver : {} ",driver.hashCode());
 		this.driver=driver;
 	}
 

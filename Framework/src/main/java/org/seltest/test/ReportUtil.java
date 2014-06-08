@@ -3,15 +3,14 @@ package org.seltest.test;
 import org.openqa.selenium.WebDriver;
 import org.seltest.core.Config;
 import org.seltest.driver.DriverManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import atu.testng.reports.ATUReports;
 
 public class ReportUtil {
 
 	private static final String screenShot = Config.captureScreenshot.getValue();
-	private static final Logger log = LoggerFactory.getLogger(ReportUtil.class);
+	private static final LoggerUtil logger = LoggerUtil.getLogger();
 	/**
 	 * Report result of test case
 	 * @param desp
@@ -91,7 +90,7 @@ public class ReportUtil {
 			ATUReports.setWebDriver(driver);
 			ATUReports.add(msg1, msg2,msg3,true);
 			}catch(Exception e){
-				log.info("Screen Shot not captured : "+msg2);
+				logger.debug("Screen Shot not captured : "+msg2);
 			}
 		}
 	}
