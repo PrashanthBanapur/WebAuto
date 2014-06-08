@@ -12,6 +12,8 @@ public class HomePage extends PageObject {
 	public static final String URL = Config.baseUrl.getValue()+"mercurywelcome.php";
 	@FindBy(linkText="SIGN-ON")
 	private WebElement lnkSignOn;
+	@FindBy(linkText="SIGN-OFF")
+	private WebElement lnkSignOff;
 	@FindBy(linkText="REGISTER")
 	private WebElement lnkRegister;
 	
@@ -22,6 +24,11 @@ public class HomePage extends PageObject {
 	public SignOnPage clickSignOn(){
 		step.click(lnkSignOn);
 		return PageFactory.initElements(driver, SignOnPage.class);
+	}
+
+	public void clickSignOff() {
+		step.click(lnkSignOff);
+		
 	}
 
 }

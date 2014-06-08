@@ -21,6 +21,6 @@ public class Tests {
 
 	@AfterMethod
 	public void Close(){
-		
+		home.clickSignOff();
 	}
 }

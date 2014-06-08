@@ -9,6 +9,7 @@
 		</listeners>
 		<classes>
 			<class name="testcase.TC_SIGN_ON"></class>
+			<class name="testcase.TC_FIND_FLIGHT"></class>
 		</classes>
 	</test>
 </suite>

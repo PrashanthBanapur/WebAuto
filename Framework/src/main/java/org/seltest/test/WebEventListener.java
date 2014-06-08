@@ -40,12 +40,12 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		if(WAIT_TYPE.equals("explicit")){
 			while(i<MAX_EXPLICIT_WAIT){
 				try{
-					StepUtil.waitElementVisible(driver,by,5);
+					StepUtil.waitElementVisible(driver,by,10);
 					break;
 				}catch(TimeoutException ex){
 					StepUtil.reloadPage(driver);
 				}finally{
-					i=i+5;
+					i=i+10;
 				}
 			}
 		}
