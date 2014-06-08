@@ -1,5 +1,10 @@
 package org.seltest.core;
 
+/**
+ * Class for handling framework exceptions
+ * 
+ * @author adityas
+ **/
 public class SelTestException extends RuntimeException {
 
 	/**

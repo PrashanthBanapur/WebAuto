@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Framework Configurations will be loaded from the property file
+ * Class for Loading framework properties 
+ * 
  * @author adityas
- *
  */
 
 public enum Config {
@@ -45,6 +45,7 @@ public enum Config {
 	public String getValue() {
 		if (value == null) {
 			init();
+			log.debug("Config : {} Value : {} returned : ",value,this);
 		}
 		return value;
 	}

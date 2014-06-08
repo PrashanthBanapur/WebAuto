@@ -5,19 +5,27 @@ import java.util.Set;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.seltest.driver.DriverManager;
 
-
+/**
+ * Class contains all the method to be used by Pages to driver browser <br/>
+ * Most of the methods are wrapper of WebElement Class . With some added
+ * features to handle exceptions 
+ * @see WebElement
+ * @see StaleElementReferenceException
+ * @see TimeoutException
+ * @author adishi
+ *
+ */
 public class Step {
 
 	Step(){
 	}
-
-
 
 	/**
 	 * Select a Value based on visible text from List 
