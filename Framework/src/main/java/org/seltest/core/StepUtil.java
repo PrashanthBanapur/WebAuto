@@ -20,16 +20,15 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.seltest.driver.DriverManager;
 import org.seltest.test.LoggerUtil;
-import org.testng.SkipException;
 
 /**
  * @author adityas
  * All the Methods for executing Test Steps which are not provided by Webdriver
  */
 public class StepUtil {
-	
+
 	private static final LoggerUtil logger = LoggerUtil.getLogger();
-	private static final Step STEP= new Step();
+	private static final Step step= new Step();
 
 
 	/**
@@ -39,12 +38,12 @@ public class StepUtil {
 	 * @param Time in seconds
 	 */
 	public static void simpleWait(int minWait){
-		logger.debug("(SIMPLE WAIT)	-> TIME = "+minWait+" sec ");
-		try {
-			Thread.sleep(minWait*1000);
-		} catch (InterruptedException e) {
-			throw new SelTestException("Wait Error  for : "+minWait);
-		}
+		logger.debug("(WAIT SEC)	-> TIME = "+minWait+" sec ");
+		org.openqa.selenium.browserlaunchers.Sleeper.sleepTightInSeconds(minWait);
+	}
+	public static void simpleWaitMillSec(int millSec){
+		logger.debug("(WAIT MILL-SEC)	-> TIME = "+millSec+" mill sec ");
+		org.openqa.selenium.browserlaunchers.Sleeper.sleepTight(millSec);
 	}
 
 	public static void waitForPageLoaded(WebDriver driver) {
@@ -64,22 +63,6 @@ public class StepUtil {
 		}
 	} 
 
-
-	public static List<WebElement> waitElementWithoutStale(WebDriver driver , List<WebElement> elements){
-		int i=0;
-		while(i< Integer.parseInt(Config.explictWaitMaxTimeout.getValue())){
-			try{
-				if(elements.get(elements.size()-1).isDisplayed())
-					return elements;
-			}catch(StaleElementReferenceException e){
-				StepUtil.simpleWait(1);
-			}finally{
-				i++;
-			}
-		}
-		return elements;
-
-	}
 	/**
 	 * Wait For a particular expected condition . <br/>
 	 * <b> Max Timeout depends on config properties <b/>
@@ -162,36 +145,48 @@ public class StepUtil {
 	 * @return
 	 */
 	public static List<WebElement> getRow(WebDriver driver ,WebElement table , String unique){
-		int i=0;
+		int page=1;
 		String rowText = null;
 		while(true){
-			simpleWait(2);// TODO Need As findElements does not have explicit Wait
-			// Now get all the TR elements from the table 
-			try{
-				List<WebElement> allRows = table.findElements(By.tagName("tr")); 
-				// And iterate over them, getting the cells 
-				for (WebElement row : allRows) { 
-
-					rowText= row.getText();
-
-					if(rowText.contains(unique)){
-						List<WebElement> cells = row.findElements(By.tagName("td")); 
-						return cells;
-					}
+			StepUtil.simpleWait(5);
+			
+			List<WebElement> allRows = findElementsWithoutStale(table, By.tagName("tr")); 
+			// And iterate over them, getting the cells 
+			for (WebElement row : allRows) { 
+				rowText= step.getText(row);
+				if(rowText.contains(unique)){
+					List<WebElement> cells = findElementsWithoutStale(row,By.tagName("td")); 
+					return cells;
 				}
-			}catch(StaleElementReferenceException ex){
-				reloadPage(driver);
-				i=0;
 			}
-
+			
 			//Next Page
-			if(STEP.isPresent(By.linkText(((2+i)+"")), driver)){
-				driver.findElement(By.linkText((2+i)+"")).click();
+			page++;
+			if(step.isPresent(By.linkText(((page)+"")), driver)){
+				driver.findElement(By.linkText((page)+"")).click();
 			}else{
 				return null;
 			}
-			++i;
 		}
+	}
+
+	private static List<WebElement> findElementsWithoutStale(WebElement element , By by){
+		int retry = 0;
+		int staleMaxRetry = 12;
+		int staleWait = 5;
+		List<WebElement> toReturn = null;
+		while(retry <staleMaxRetry){
+			try{
+				toReturn = element.findElements(by); 
+				break;
+			}catch(StaleElementReferenceException ex){
+				simpleWait(staleWait);
+				logger.debug("Handling Stale Exception in findElementsWithoutStale Method !!! ");
+			}finally{
+				staleMaxRetry++;
+			}
+		}
+		return toReturn;
 	}
 
 	public static boolean clickRow(List<WebElement> cells , String button){
@@ -205,7 +200,7 @@ public class StepUtil {
 			}
 			return false;
 		}else{
-			throw new SkipException("Cells Are Empty ! ");
+			throw new SelTestException("Cells Are Empty ! ");
 		}
 	}
 

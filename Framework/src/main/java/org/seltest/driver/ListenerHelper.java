@@ -2,6 +2,7 @@ package org.seltest.driver;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
+
 import org.openqa.selenium.WebDriver;
 import org.seltest.core.TestCase;
 import org.seltest.core.TestInfo;
@@ -32,13 +33,12 @@ public class ListenerHelper {
 
 	public void onTestStart(ITestResult result) {
 		TestCase.setTestName(result.getName());
-		logger.test("	(START)	-> Test Case : ");
+		logger.test("	(START)	-> Test Case :  ");
 		processAnnotation(result);
 
 	}
 
 	public void onTestSuccess(ITestResult result) {
-		//test.info("	(SUCCESS)	-> Test Case : {} ",result.getName());
 		logger.test("	(SUCCESS)	-> Test Case : ");
 		setTestInfo();
 		ReportUtil.reportResult("SUCCESS", result.getName(), "");
@@ -60,6 +60,7 @@ public class ListenerHelper {
 
 	public void beforeConfiguration(ITestResult result) {
 		logger.test("	(START)	-> Config Name : ");
+		
 	}
 
 	public void onConfigurationFailure(ITestResult result){
@@ -89,7 +90,7 @@ public class ListenerHelper {
 	}
 
 	public void onStart(ISuite suite) {
-
+		
 		parallelMode=suite.getParallel().toLowerCase();// Get parallel mode
 
 		if(!suiteCalled){
@@ -117,22 +118,18 @@ public class ListenerHelper {
 		}
 	}
 
-	private void createWebDriver(){
+	private synchronized void createWebDriver(){
 		
 		WebDriver driver = DriverFactory.getDriver();
-		logger.debug("Driver Created : "+driver);
-		if(driver==null){
-			driver = DriverFactory.getDriver();
-			logger.debug("(RETRYING TO SET DRIVER ");
-		}
+		logger.debug("Driver Created : "+driver.hashCode());
 		DriverManager.setWebDriver(driver);		
 
 	}
 
-	private void quitWebDriver(){
+	private synchronized void quitWebDriver(){
 		WebDriver driver = DriverManager.getDriver();
-		logger.debug(" Driver Going to Quit "+driver);
 		if (driver != null) {
+			logger.debug(" Driver Going to Quit "+driver.hashCode());
 			driver.quit();
 		}
 

@@ -3,6 +3,8 @@ package org.seltest.driver;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -34,7 +36,9 @@ final class DriverFactory {
 	 static WebDriver getDriver(){
 		WebDriver driver=null;
 		if(browser.equalsIgnoreCase("FIREFOX")){
-			driver = new FirefoxDriver();
+			ProfilesIni profile = new ProfilesIni();
+			FirefoxProfile ffprofile = profile.getProfile("default");
+			driver = new FirefoxDriver(ffprofile);
 
 		}else if(browser.equalsIgnoreCase("CHROME")){			
 			System.setProperty("webdriver.chrome.driver", driverPath+"/chromedriver.exe");
@@ -47,7 +51,7 @@ final class DriverFactory {
 			System.setProperty("webdriver.ie.driver", driverPath+"/iedriver.exe");
 			driver = new InternetExplorerDriver();
 		}
-		// Adding Web Event Listner
+		// Adding Web Event Listener
 		if(eventFiring){
 			EventFiringWebDriver efirDriver = new EventFiringWebDriver(driver);
 			WebEventListener driverListner = new WebEventListener();

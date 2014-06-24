@@ -3,6 +3,7 @@ package org.seltest.test;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.openqa.selenium.WebDriver;
 import org.seltest.core.TestCase;
 import org.seltest.driver.DriverManager;
 import org.slf4j.Logger;
@@ -31,7 +32,12 @@ public class LoggerUtil {
 	}
 
 	public void test(String msg ) {
-		seltest.info(" |T={}: {} {}",Thread.currentThread().getId(),msg,getTestName());
+		WebDriver driver = DriverManager.getDriver();
+		if(driver==null){
+			seltest.info(" |T={}: {} {}",Thread.currentThread().getId(),msg,getTestName());
+		}else{
+			seltest.info(" |T={}:		|[D={}]	 |-<{}>	-{}",Thread.currentThread().getId(),driver.hashCode(),getTestName(),msg);
+		}
 	}
 
 	public void test(String msg , String arg){
@@ -80,6 +86,12 @@ public class LoggerUtil {
 		format = "|T="+Thread.currentThread().getId()+" :	"+format;
 		seltest.debug(format,arguments);
 	}
+	
+	public void trace(String format , Object ... arguments){
+		format = "|T="+Thread.currentThread().getId()+" :	"+format;
+		seltest.trace(format,arguments);
+	}
+	
 	public void warn(String format , Object ... arguments){
 		format = "|T="+Thread.currentThread().getId()+" :	"+format;
 		seltest.warn(format, arguments);

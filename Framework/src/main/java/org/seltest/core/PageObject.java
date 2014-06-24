@@ -15,25 +15,7 @@ public class PageObject {
 	protected final static Step step = new Step();
 
 	public PageObject(WebDriver driver){
-		logger.debug("Created Page Object on Driver : {} ",driver.hashCode());
+		logger.trace("Created Page Object on Driver : {} ",driver.hashCode());
 		this.driver=driver;
-	}
-
-	/**
-	 * Page Url Should be returned<br/>
-	 * <b> Note :Should Add Wait before return Url <b/>
-	 */
-	public String getUrl() {
-		return driver.getCurrentUrl().split("\\?")[0];// Remove parameters
-	}
-
-
-	/**
-	 * Page Title Should be returned <br/>
-	 * <b> Note :Should Add Wait before return Title <b/>
-	 * @return
-	 */
-	public String getTitle() {
-		return driver.getTitle();
 	}
 }

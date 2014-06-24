@@ -22,9 +22,9 @@ public enum Config {
 	eventfiring,
 	fullscreen,
 	captureScreenshot,
-	waitType,
-	implicitWait,
 	explictWaitMaxTimeout,
+	exceptionMaxRetry,
+	exceptionMaxWait,
 	dbDriver,
 	dbUrl,
 	dbUsername,
@@ -75,15 +75,6 @@ public enum Config {
 		case explictWaitMaxTimeout :
 			break;
 		case fullscreen :
-			break;
-		case implicitWait :
-			if(Integer.parseInt(val)<3){
-				logger.warn(" Script may fail if implicit wait is less then 3 sec ");
-			}
-			break;
-		case  waitType :
-			if(val.equals("implicit"))
-				logger.warn(" explict wait improves execution time by 30 %");
 			break;
 		case dbDriver:
 			//TODO Add validation
