@@ -11,7 +11,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.seltest.driver.DriverManager;
-import org.seltest.test.LoggerUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class contains all the method to be used by Pages to driver browser <br/>
@@ -24,7 +25,9 @@ import org.seltest.test.LoggerUtil;
  *
  */
 public class Step {
-	private static LoggerUtil logger = LoggerUtil.getLogger();
+	private static Logger log = LoggerFactory.getLogger(Step.class);
+	private static final int MAX_RETRY = Integer.parseInt(Config.exceptionRetry.getValue());
+
 
 	Step(){
 	}
@@ -128,23 +131,21 @@ public class Step {
 	public String getText(WebElement element) {
 
 		int retry = 0;
-		int staleMaxRetry = 12;
-		int staleWait = 5;
-		while(retry<staleMaxRetry){
+		while(retry<MAX_RETRY){
 			try{
 				String value = element.getAttribute("value");
 				String text = element.getText();
 				if(value == null && text ==null ){
-					StepUtil.simpleWait(1);
+					StepUtil.defaultWait();
 				}else if(value != null){				
 					return value;
 				}else if(text != null){
 					return element.getText();
 				}
 			}catch(StaleElementReferenceException e){
-				StepUtil.simpleWait(staleWait);
-				logger.debug("Stale Element Exception in getText !!! "+retry);
-				if(retry==staleMaxRetry/2){
+				StepUtil.defaultWait();
+				log.debug("Stale Element Exception in getText !!! "+retry);
+				if(retry==MAX_RETRY/2){
 					WebDriver driver =DriverManager.getDriver();
 					StepUtil.reloadPage(driver);
 				}

@@ -4,7 +4,10 @@
 package org.seltest.test;
 
 import org.openqa.selenium.WebDriver;
+import org.seltest.core.Config;
 import org.seltest.core.StepUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.asserts.Assertion;
 import org.testng.asserts.IAssert;
 
@@ -16,8 +19,8 @@ import org.testng.asserts.IAssert;
 public class HardAssertion extends Assertion {
 
 	private final LoggerUtil logger = LoggerUtil.getLogger();
-	private final int MAX_RETRY = 5;
-	private final int RETRY_WAIT = 5;
+	private final Logger log = LoggerFactory.getLogger(HardAssertion.class);
+	private final int MAX_RETRY = Integer.parseInt(Config.exceptionRetry.getValue());
 
 	@Override
 	public void onAssertFailure(IAssert assertCommand, AssertionError ex) {
@@ -40,8 +43,8 @@ public class HardAssertion extends Assertion {
 				assert(actual.equals(expectedTitle));
 				break;
 			}catch(AssertionError e){
-				StepUtil.simpleWait(RETRY_WAIT);
-				logger.web("( HANDLED EXCEPTION) 	-> Message = "+e.getClass());
+				StepUtil.defaultWait();
+				log.info(LoggerUtil.webFormat()+"( HANDLED EXCEPTION) 	-> Message : {} ",e.getClass());
 			}finally{
 				retry++;
 			}
@@ -60,8 +63,8 @@ public class HardAssertion extends Assertion {
 				assert(actual.equals(expectedUrl));
 				break;
 			}catch(AssertionError e){
-				StepUtil.simpleWait(RETRY_WAIT);
-				logger.web("( HANDLED EXCEPTION) 	-> Message = "+e.getClass());
+				StepUtil.defaultWait();
+				log.info(LoggerUtil.webFormat()+"( HANDLED EXCEPTION) 	-> Message : {} ",e.getClass());
 			}finally{
 				retry++;
 			}

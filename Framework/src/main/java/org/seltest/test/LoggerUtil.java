@@ -3,9 +3,7 @@ package org.seltest.test;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.openqa.selenium.WebDriver;
 import org.seltest.core.TestCase;
-import org.seltest.driver.DriverManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.asserts.IAssert;
@@ -25,25 +23,6 @@ public class LoggerUtil {
 		return logger;
 	}
 
-
-
-	public void web(String msg){
-		seltest.info(" |T={}:		|[D={}]	 |-<{}>	-{}",Thread.currentThread().getId(),DriverManager.getDriver().hashCode(),getTestName(),msg);
-	}
-
-	public void test(String msg ) {
-		WebDriver driver = DriverManager.getDriver();
-		if(driver==null){
-			seltest.info(" |T={}: {} {}",Thread.currentThread().getId(),msg,getTestName());
-		}else{
-			seltest.info(" |T={}:		|[D={}]	 |-<{}>	-{}",Thread.currentThread().getId(),driver.hashCode(),getTestName(),msg);
-		}
-	}
-
-	public void test(String msg , String arg){
-		seltest.info(" |T={}: {} {}",Thread.currentThread().getId(),msg,arg);
-	}
-
 	public void exception(Throwable throwable){
 		seltest.error("(EXCEPTION) 	-> Message = "+throwable.getLocalizedMessage()+" ");
 		StringWriter sw = new StringWriter();
@@ -58,19 +37,25 @@ public class LoggerUtil {
 		String msg = assertCommand.getMessage();
 
 		if(expected!=null){
-			seltest.info(" |T={}:	{} :- EXPECTED =  '{}' , ACTUAL = '{}' ",Thread.currentThread().getId(),status,expected,actual);
+			seltest.info("|-{} :- EXPECTED =  '{}' , ACTUAL = '{}' ",status,expected,actual);
 			ReportUtil.reportAssert("ASSERT "+status.toLowerCase(), expected, actual);
 		}else if(msg!=null){
-			seltest.info(" |T={}:	{} :- Message : {}  ",Thread.currentThread().getId(),status,msg);
+			seltest.info("|-{} :- Message : {}  ",status,msg);
 			ReportUtil.reportAssert("ASSERT "+status.toUpperCase(),msg, "");
 		}else {
-			seltest.info(" |T={}:	{} ",Thread.currentThread().getId(),status);
+			seltest.info("|-{} ",status);
 			ReportUtil.reportAssert("ASSERT "+status.toUpperCase(), "","");
 		}
 
 	}
 
-	private String getTestName(){
+	public static String webFormat(){
+		return "	 |-<"+getTestName()+">	- ";
+	}
+	public static String testFormat() {
+		return "|-<"+getTestName()+">	- ";
+	}
+	private static String getTestName(){
 		String name = TestCase.getTestName();
 		if(name!=null)
 			return name;
@@ -78,23 +63,5 @@ public class LoggerUtil {
 			return "config";
 	}
 
-	public void info(String format , Object ... arguments ){
-		format = "|T="+Thread.currentThread().getId()+" :	"+format;
-		seltest.info(format, arguments);
-	}
-	public void debug(String format , Object ... arguments){
-		format = "|T="+Thread.currentThread().getId()+" :	"+format;
-		seltest.debug(format,arguments);
-	}
-	
-	public void trace(String format , Object ... arguments){
-		format = "|T="+Thread.currentThread().getId()+" :	"+format;
-		seltest.trace(format,arguments);
-	}
-	
-	public void warn(String format , Object ... arguments){
-		format = "|T="+Thread.currentThread().getId()+" :	"+format;
-		seltest.warn(format, arguments);
-	}
 
 }

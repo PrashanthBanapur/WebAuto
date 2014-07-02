@@ -18,8 +18,9 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.seltest.driver.DriverManager;
 import org.seltest.test.LoggerUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author adityas
@@ -27,7 +28,8 @@ import org.seltest.test.LoggerUtil;
  */
 public class StepUtil {
 
-	private static final LoggerUtil logger = LoggerUtil.getLogger();
+	private static final Logger log = LoggerFactory.getLogger(StepUtil.class);
+	private static final int MAX_RETRY = Integer.parseInt(Config.exceptionRetry.getValue());
 	private static final Step step= new Step();
 
 
@@ -38,14 +40,21 @@ public class StepUtil {
 	 * @param Time in seconds
 	 */
 	public static void simpleWait(int minWait){
-		logger.debug("(WAIT SEC)	-> TIME = "+minWait+" sec ");
+		log.debug("(WAIT SEC)	-> TIME = "+minWait+" sec ");
 		org.openqa.selenium.browserlaunchers.Sleeper.sleepTightInSeconds(minWait);
 	}
 	public static void simpleWaitMillSec(int millSec){
-		logger.debug("(WAIT MILL-SEC)	-> TIME = "+millSec+" mill sec ");
+		log.debug("(WAIT MILL-SEC)	-> TIME = "+millSec+" mill sec ");
 		org.openqa.selenium.browserlaunchers.Sleeper.sleepTight(millSec);
 	}
 
+	/**
+	 * Wait for the Time mentioned in properties file
+	 */
+	public static void defaultWait(){
+		int defaultWait = Integer.parseInt(Config.defaultWait.getValue());
+		simpleWait(defaultWait);
+	}
 	public static void waitForPageLoaded(WebDriver driver) {
 
 		ExpectedCondition<Boolean> expectation = new
@@ -63,36 +72,12 @@ public class StepUtil {
 		}
 	} 
 
-	/**
-	 * Wait For a particular expected condition . <br/>
-	 * <b> Max Timeout depends on config properties <b/>
-	 * @see ExpectedConditions
-	 */
-	public static void waitElementVisible(WebDriver driver ,By by){
-		WebDriverWait wait = new WebDriverWait(driver,Integer.parseInt(Config.explictWaitMaxTimeout.getValue()));
-		wait.until(ExpectedConditions.visibilityOfElementLocated(by));
-		wait.pollingEvery(1, TimeUnit.SECONDS);
-		wait.ignoring(NoSuchElementException.class);
-		wait.ignoring(StaleElementReferenceException.class);
-
-	}
-
 	public static void waitElementVisible(WebDriver driver , By by , int time){
 		WebDriverWait wait = new WebDriverWait(driver,time);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(by));
 		wait.pollingEvery(1, TimeUnit.SECONDS);
 		wait.ignoring(NoSuchElementException.class);
 		wait.ignoring(StaleElementReferenceException.class);
-	}
-
-	/**
-	 * Implicit wait for the mentioned time
-	 * @param Time in seconds
-	 */
-	public static void waitImplicit(int minWait) {
-		WebDriver driver = DriverManager.getDriver();
-		driver.manage().timeouts().implicitlyWait(minWait, TimeUnit.SECONDS);
-
 	}
 
 	/**
@@ -111,7 +96,7 @@ public class StepUtil {
 		if(driver.getTitle().equals(title)){ // Both have same title switch to 2nd
 			throw new IllegalArgumentException("Current Title and Swicth window title are same ");
 		}
-		logger.web(" (SWITCH WINDOW)	-> To Page : "+title);
+		log.info(LoggerUtil.webFormat()+"(SWITCH WINDOW)	-> To Page : {} ",title);
 
 		while(winItr.hasNext()){
 			window = winItr.next();
@@ -128,7 +113,7 @@ public class StepUtil {
 	 */
 	public static void windowClose(WebDriver driver){
 		Set<String> windows = driver.getWindowHandles();
-		logger.web(" (CLOSE WINDOW)	-> Page Title : "+driver.getTitle());
+		log.info(LoggerUtil.webFormat()+"(CLOSE WINDOW)	-> Page Title : {} ",driver.getTitle());
 		driver.close();
 		for(String window : windows){
 			driver.switchTo().window(window);
@@ -156,6 +141,7 @@ public class StepUtil {
 				rowText= step.getText(row);
 				if(rowText.contains(unique)){
 					List<WebElement> cells = findElementsWithoutStale(row,By.tagName("td")); 
+					log.trace("Row Found : {} ", rowText);
 					return cells;
 				}
 			}
@@ -172,18 +158,16 @@ public class StepUtil {
 
 	private static List<WebElement> findElementsWithoutStale(WebElement element , By by){
 		int retry = 0;
-		int staleMaxRetry = 12;
-		int staleWait = 5;
 		List<WebElement> toReturn = null;
-		while(retry <staleMaxRetry){
+		while(retry <MAX_RETRY){
 			try{
 				toReturn = element.findElements(by); 
 				break;
 			}catch(StaleElementReferenceException ex){
-				simpleWait(staleWait);
-				logger.debug("Handling Stale Exception in findElementsWithoutStale Method !!! ");
+				defaultWait();
+				log.debug("Handling Stale Exception in findElementsWithoutStale Method !!! ");
 			}finally{
-				staleMaxRetry++;
+				retry++;
 			}
 		}
 		return toReturn;
@@ -206,6 +190,7 @@ public class StepUtil {
 
 	public static void reloadPage(WebDriver driver){
 		driver.navigate().refresh();
+		log.trace("Reloading Page ");
 		waitForPageLoaded(driver);
 	}
 
@@ -216,84 +201,9 @@ public class StepUtil {
 	}
 
 	public static void acceptAlert(WebDriver driver){
-		//	StepUtil.simpleWait(3);
 		driver.switchTo().alert().accept();
+		log.trace("Alert Accepted :");
 	}
 
-	/**
-	 *  Draws a red border around the found element
-	 * @param driver
-	 * @param element
-	 * @return current border
-	 */
-	public static String highlightElement(WebDriver driver,WebElement element) {
-		// draw a border around the found element
-		String border = null;
-		if (driver instanceof JavascriptExecutor) {
-			border = (String) ((JavascriptExecutor)driver).executeScript(SCRIPT_GET_ELEMENT_BORDER, element);
-			((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", element);
-		}
-		return border;
-
-	}
-
-	/**
-	 * Un Highlight Already Highlighted Element 
-	 * @param driver
-	 * @return
-	 */
-	public static WebElement unhighlightElement(WebDriver driver , WebElement element , String border){
-		if (driver instanceof JavascriptExecutor) {
-			try {
-				((JavascriptExecutor)driver).executeScript(SCRIPT_UNHIGHLIGHT_ELEMENT, element, border);
-			} catch (StaleElementReferenceException ignored) {
-				// the page got reloaded, the element isn't there
-			} 
-		}
-		return element;
-	}
-
-
-	private static final String SCRIPT_GET_ELEMENT_BORDER = 
-			" var elem = arguments[0]; "+
-					" if (elem.currentStyle) { "+
-					"   var style = elem.currentStyle; "+
-					"   var border = style['borderTopWidth'] "+
-					"           + ' ' + style['borderTopStyle'] "+
-					"          + ' ' + style['borderTopColor'] "+
-					"          + ';' + style['borderRightWidth'] "+
-					"          + ' ' + style['borderRightStyle'] "+
-					"          + ' ' + style['borderRightColor'] "+
-					"          + ';' + style['borderBottomWidth'] "+
-					"          + ' ' + style['borderBottomStyle'] "+
-					"          + ' ' + style['borderBottomColor'] "+
-					"          + ';' + style['borderLeftWidth'] "+
-					"          + ' ' + style['borderLeftStyle'] "+
-					"          + ' ' + style['borderLeftColor']; "+
-					"	} else if (window.getComputedStyle) { "+
-					"  var style = document.defaultView.getComputedStyle(elem); "+
-					"   var border = style.getPropertyValue('border-top-width') "+
-					"          + ' ' + style.getPropertyValue('border-top-style') "+
-					"           + ' ' + style.getPropertyValue('border-top-color') "+
-					"           + ';' + style.getPropertyValue('border-right-width') "+
-					"           + ' ' + style.getPropertyValue('border-right-style') "+
-					"           + ' ' + style.getPropertyValue('border-right-color') "+
-					"           + ';' + style.getPropertyValue('border-bottom-width') "+
-					"           + ' ' + style.getPropertyValue('border-bottom-style') "+
-					"           + ' ' + style.getPropertyValue('border-bottom-color') "+
-					"           + ';' + style.getPropertyValue('border-left-width') "+
-					"           + ' ' + style.getPropertyValue('border-left-style') "+
-					"           + ' ' + style.getPropertyValue('border-left-color'); "+
-					"	} "+
-					"return border;" ;
-
-	private static final String SCRIPT_UNHIGHLIGHT_ELEMENT =
-			"	var elem = arguments[0]; "+
-					"var borders = arguments[1].split(';');"+
-					"elem.style.borderTop = borders[0];"+
-					"elem.style.borderRight = borders[1];"+
-					"elem.style.borderBottom = borders[2];"+
-					"elem.style.borderLeft = borders[3];";
-} 
-
+}
 
