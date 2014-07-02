@@ -11,6 +11,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.seltest.driver.DriverManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class contains all the method to be used by Pages to driver browser <br/>
@@ -23,6 +25,9 @@ import org.seltest.driver.DriverManager;
  *
  */
 public class Step {
+	private static Logger log = LoggerFactory.getLogger(Step.class);
+	private static final int MAX_RETRY = Integer.parseInt(Config.exceptionRetry.getValue());
+
 
 	Step(){
 	}
@@ -42,7 +47,7 @@ public class Step {
 	 * Click on a Checkbox by finding using css
 	 * @param element WebElement which has check box
 	 */
-	public void Checkboxclick(WebElement element) {
+	public void checkboxClick(WebElement element) {
 		element.findElement(By.cssSelector("input[type='checkbox']")).click();;
 	}
 
@@ -89,9 +94,8 @@ public class Step {
 	 * Click on a WebElement and switch to the new Window
 	 * @param element
 	 */
-	public void clickAndSwitch(WebElement element){
+	public void clickAndSwitch(WebElement element , WebDriver driver){
 
-		WebDriver driver = DriverManager.getDriver();
 		String winHandleBefore = driver.getWindowHandle();
 		click(element);
 		Set<String> windows = driver.getWindowHandles();
@@ -125,27 +129,28 @@ public class Step {
 	 * @return Text in the field
 	 */
 	public String getText(WebElement element) {
-		
-		int i =0;
-		while(i<Integer.parseInt(Config.explictWaitMaxTimeout.getValue())){
+
+		int retry = 0;
+		while(retry<MAX_RETRY){
 			try{
 				String value = element.getAttribute("value");
 				String text = element.getText();
 				if(value == null && text ==null ){
-					StepUtil.simpleWait(1);
+					StepUtil.defaultWait();
 				}else if(value != null){				
 					return value;
 				}else if(text != null){
 					return element.getText();
 				}
 			}catch(StaleElementReferenceException e){
-				StepUtil.simpleWait(1);
-				if(i%10==0&& i>1){
+				StepUtil.defaultWait();
+				log.debug("Stale Element Exception in getText !!! "+retry);
+				if(retry==MAX_RETRY/2){
 					WebDriver driver =DriverManager.getDriver();
 					StepUtil.reloadPage(driver);
 				}
 			}finally{
-				++i;
+				retry++;
 			}
 		}
 		throw new SelTestException("Unable to Get Element Text "+element);
@@ -168,7 +173,7 @@ public class Step {
 		}
 	}
 
-	
+
 	/**
 	 * Verify if an Element is Enabled
 	 * @param element
@@ -250,7 +255,7 @@ public class Step {
 		}
 		return simpleDriver;
 	}
-	
+
 	private String getValue(WebElement element){
 		String elementType =element.toString();
 		int valueBeginIndex = elementType.lastIndexOf(':')+2;
@@ -258,7 +263,7 @@ public class Step {
 		String value = elementType.substring(valueBeginIndex, valueEndIndex);
 		return value;
 	}
-	
+
 	private By getBy(WebElement element,String value) {
 		String elementType = element.toString();
 		if(elementType.contains("partial link text")){

@@ -1,9 +1,5 @@
 package org.seltest.test;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.concurrent.TimeUnit;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -18,45 +14,43 @@ import org.slf4j.LoggerFactory;
 
 public class WebEventListener extends AbstractWebDriverEventListener {
 
-	private final Logger log = LoggerFactory.getLogger("STEP");
-	//	private static final int MIN_WAIT=3; // Imp don't reduce the time unless you are sure
-	private static final String WAIT_TYPE = Config.waitType.getValue();
-	private static final int IMPLICIT_WAIT_TIME = Integer.parseInt(Config.implicitWait.getValue());
-	private static final int MAX_EXPLICIT_WAIT = Integer.parseInt(Config.explictWaitMaxTimeout.getValue());
+	private static final int MAX_RETRY = Integer.parseInt(Config.exceptionRetry.getValue());
+	private static final int DEFAULT_WAIT = Integer.parseInt(Config.defaultWait.getValue());
+	private static final Logger log = LoggerFactory.getLogger(WebEventListener.class);
 	private static final LoggerUtil logger = LoggerUtil.getLogger();
 
 
 	public void afterClickOn(WebElement element , WebDriver driver){
-		//Implicit Wait 
-		if(WAIT_TYPE.equals("implicit")){
-			StepUtil.simpleWait(IMPLICIT_WAIT_TIME);
-		}
-		//		else{
-		//			StepUtil.simpleWait(MIN_WAIT);
-		//		}
+		log.trace("After Click On : {} ",element);
+		/*NOTE : Dont Add any check here 
+		 * as POP will fail if some action is done after click
+		 */
 	}
 	public void beforeFindBy(By by, WebElement element, WebDriver driver) {
-		int i=0;
-		if(WAIT_TYPE.equals("explicit")){
-			while(i<MAX_EXPLICIT_WAIT){
-				try{
-					StepUtil.waitElementVisible(driver,by,10);
-					break;
-				}catch(TimeoutException ex){
+		int retry=0;
+		log.trace("Before Find By :{} ",by);
+		while(retry<MAX_RETRY){
+			try{
+				StepUtil.waitElementVisible(driver,by,DEFAULT_WAIT);
+				break;
+			}catch(TimeoutException ex){
+				if(retry==MAX_RETRY/2){
 					StepUtil.reloadPage(driver);
-				}finally{
-					i=i+10;
 				}
+			}finally{
+				retry++;
 			}
 		}
 	}
 
+	public void afterFindBy(By by, WebElement element, WebDriver driver) {
+		log.trace("After Find By : {} ",by);
+	}
 
 	public void afterNavigateTo(String url, WebDriver driver) {
-		logger.web("(NAVIGATE)	-> To Url : "+url);
-		//		StepUtil.simpleWait(MIN_WAIT);
-		driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
-		ReportUtil.reportWebStep("GO TO ", url , "");
+		log.info(LoggerUtil.webFormat()+"(NAVIGATE)	-> To Url : {} ",url);
+		StepUtil.waitForPageLoaded(driver);
+		ReportUtil.reportWebStep(null,"GO TO ", url , "");
 	}
 
 	public void beforeClickOn(WebElement element, WebDriver driver) {
@@ -66,10 +60,8 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		}else{
 			elementValue=element.getText();
 		}
-		logger.web("(CLICK ON)	-> Element = '"+elementValue+"'");
-		String border =StepUtil.highlightElement(driver, element);
-		ReportUtil.reportWebStep("CLICK",elementValue,"");
-		StepUtil.unhighlightElement(driver, element,border);
+		log.info(LoggerUtil.webFormat()+"(CLICK ON)	-> Element = '{}'",elementValue);
+		ReportUtil.reportWebStep(element,"CLICK",elementValue,"");
 
 	}
 
@@ -77,16 +69,14 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		String elemValue = element.getAttribute("value");
 		String elemName = element.getAttribute("name");
 		String elemId = element.getAttribute("id");
-		String border=StepUtil.highlightElement(driver, element);
 		if(elemId.length()>3){
-			logger.web("(CHANGED)	-> Element = '"+elemId+"' New Value = '"+elemValue+"'");
-			ReportUtil.reportWebStep("CHANGED",elemId,elemValue);
+			log.info(LoggerUtil.webFormat()+"(CHANGED)	-> Element = '"+elemId+"' New Value = '{}'",elemValue);
+			ReportUtil.reportWebStep(element,"CHANGED",elemId,elemValue);
 
 		}else{
-			logger.web("(CHANGED)	-> Element = '"+elemName+"' New Value = '"+elemValue+"'");
-			ReportUtil.reportWebStep("CHANGED",elemId,elemValue);
+			log.info(LoggerUtil.webFormat()+"(CHANGED)	-> Element = '"+elemName+"' New Value = '{}'",elemValue);
+			ReportUtil.reportWebStep(element ,"CHANGED",elemId,elemValue);
 		}
-		StepUtil.unhighlightElement(driver, element,border);
 
 	}
 
@@ -95,25 +85,27 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 		String elemName = element.getAttribute("name");
 		String elemId = element.getAttribute("id");
 		if(elemId.length()>3){
-			logger.web("(CHANGING)	-> Element = '"+elemId+"' Old Value = '"+elemValue+"' ");
+			log.info(LoggerUtil.webFormat()+"(CHANGING)	-> Element = '"+elemId+"' Old Value = '{}' ",elemValue);
 		}else {
-			logger.web("(CHANGING)	-> Element = '"+elemName+"' Old Value = '"+elemValue+"' ");
+			log.info(LoggerUtil.webFormat()+"(CHANGING)	-> Element = '"+elemName+"' Old Value = '{}' ",elemValue);
 
 		}
 	}
 
 
 	public void onException(Throwable throwable, WebDriver driver) {
-		if((throwable instanceof NoSuchElementException) || (throwable instanceof StaleElementReferenceException)){
-			logger.web("( HANDLED EXCEPTION) 	-> Message = "+throwable.getClass());
+		if(		(throwable instanceof NoSuchElementException) ||
+				(throwable instanceof StaleElementReferenceException) ||
+				(throwable instanceof AssertionError)){
+
+			log.debug("( HANDLED EXCEPTION) 	-> Message = "+throwable.getClass());
+			log.trace(throwable.getMessage());
 		}
 		else{
-			logger.web("(EXCEPTION) 	-> Message = "+throwable.getLocalizedMessage()+" ");
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			throwable.printStackTrace(pw);
-			log.error(sw.toString()); // stack trace as a string
+			log.info(LoggerUtil.webFormat()+"(EXCEPTION) 	-> Message = "+throwable.getLocalizedMessage()+" ");
+			logger.exception(throwable); // stack trace as a string
 			ReportUtil.reportException("EXCEPTION", throwable.getLocalizedMessage().substring(0, 50), "");// TODO Make it Small message
+			log.trace(throwable.getMessage());
 		}
 	}
 

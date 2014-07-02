@@ -5,7 +5,15 @@ public class TestCase {
 	private static ThreadLocal<String> author = new ThreadLocal<String>();
 	private static ThreadLocal<String> date = new ThreadLocal<String>();
 	private static ThreadLocal<String> version = new ThreadLocal<String>();
+	private static ThreadLocal<Integer> sleep = new ThreadLocal<Integer>();
 
+	public static void setSleepTime(int val){
+		sleep.set(val);
+	}
+	public static int getSleepTime(){
+		return sleep.get();
+	}
+	
 	public static String getTestName() {
 		return testName.get();
 	}
