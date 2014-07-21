@@ -114,7 +114,7 @@ public class Element {
 		// Click on Body Tag if IE Browser to Focus
 		if(browserName.equalsIgnoreCase("ie")){
 			WebDriver driver = DriverManager.getDriver();
-			driver.findElement(By.tagName("body")).click();
+			driver.switchTo().window(driver.getWindowHandle());//Force Focus
 		}
 
 		log.trace(" Element Click : {} " , element);

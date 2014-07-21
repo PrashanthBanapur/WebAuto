@@ -62,7 +62,7 @@ public class Browser {
 		}
 	} 
 
-	
+
 	/**
 	 * Switch to the window based on the title <br/>
 	 * Use <b>clickSwitch() </b> to switch to new window
@@ -126,7 +126,16 @@ public class Browser {
 	 * @param driver
 	 */
 	public  void acceptAlert(WebDriver driver){
-		driver.switchTo().alert().accept();
+
+		String browserName = Config.browser.getValue();
+
+		if(browserName.equalsIgnoreCase("safari")){
+			((JavascriptExecutor)driver).executeScript("confirm = function(message){return true;};");
+		}else{
+			driver.switchTo().alert().accept();
+		}
+
+
 		log.trace("Alert Accepted :");
 	}
 
