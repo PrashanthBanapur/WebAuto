@@ -23,18 +23,18 @@ public class HomePage extends PageObject implements StartState{
 	}
 	
 	public SignOnPage clickSignOn(){
-		step.click(lnkSignOn);
+		element.click(lnkSignOn);
 		return PageFactory.initElements(driver, SignOnPage.class);
 	}
 
 	public void clickSignOff() {
-		step.click(lnkSignOff);
+		element.click(lnkSignOff);
 		
 	}
 
 	@Override
 	public Boolean isStartState() {
-		if(step.isDisplayed(lnkSignOn)){
+		if(element.isDisplayed(lnkSignOn)){
 			return true;
 		}else{
 			return false;
@@ -44,7 +44,7 @@ public class HomePage extends PageObject implements StartState{
 
 	@Override
 	public void goToStartPage() {
-		step.click(lnkSignOff);
+		element.click(lnkSignOff);
 	}
 
 }

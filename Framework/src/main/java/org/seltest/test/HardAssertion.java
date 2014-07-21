@@ -5,7 +5,7 @@ package org.seltest.test;
 
 import org.openqa.selenium.WebDriver;
 import org.seltest.core.Config;
-import org.seltest.core.StepUtil;
+import org.seltest.core.Browser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.asserts.Assertion;
@@ -18,9 +18,11 @@ import org.testng.asserts.IAssert;
  */
 public class HardAssertion extends Assertion {
 
+	private final Browser browser = new Browser();
 	private final LoggerUtil logger = LoggerUtil.getLogger();
 	private final Logger log = LoggerFactory.getLogger(HardAssertion.class);
 	private final int MAX_RETRY = Integer.parseInt(Config.exceptionRetry.getValue());
+	private final int EXCEPTION_INTERVAL = Integer.parseInt(Config.waitMaxTimeout.getValue())/MAX_RETRY;
 
 	@Override
 	public void onAssertFailure(IAssert assertCommand, AssertionError ex) {
@@ -35,7 +37,7 @@ public class HardAssertion extends Assertion {
 
 	public void assertTitle(WebDriver driver ,String expectedTitle){
 		int retry =0;
-		StepUtil.waitForPageLoaded(driver);
+		browser.waitForPageLoaded(driver);
 		String actual=null;
 		while(retry<MAX_RETRY){
 			actual =driver.getTitle();
@@ -43,7 +45,7 @@ public class HardAssertion extends Assertion {
 				assert(actual.equals(expectedTitle));
 				break;
 			}catch(AssertionError e){
-				StepUtil.defaultWait();
+				browser.simpleWait(EXCEPTION_INTERVAL);
 				log.info(LoggerUtil.webFormat()+"( HANDLED EXCEPTION) 	-> Message : {} ",e.getClass());
 			}finally{
 				retry++;
@@ -55,7 +57,7 @@ public class HardAssertion extends Assertion {
 
 	public void assertUrl(WebDriver driver , String expectedUrl){
 		int retry =0;
-		StepUtil.waitForPageLoaded(driver);
+		browser.waitForPageLoaded(driver);
 		String actual = null;
 		while(retry<MAX_RETRY){
 			actual =driver.getCurrentUrl().split("\\?")[0];// Remove parameters
@@ -63,7 +65,7 @@ public class HardAssertion extends Assertion {
 				assert(actual.equals(expectedUrl));
 				break;
 			}catch(AssertionError e){
-				StepUtil.defaultWait();
+				browser.simpleWait(EXCEPTION_INTERVAL);
 				log.info(LoggerUtil.webFormat()+"( HANDLED EXCEPTION) 	-> Message : {} ",e.getClass());
 			}finally{
 				retry++;

@@ -37,37 +37,37 @@ public class FlightFinderPage extends PageObject {
 		super(driver);
 	}
 	public void selectTripType(String val){
-		step.clickRadioButton(rBtnTripType, val);
+		element.clickRadioButton(rBtnTripType, val);
 	}
 	public void selectPassCount(String val){
-		step.select(ddPassCount, val);
+		element.select(ddPassCount, val);
 	}
 	public void selectFromPort(String val){
-		step.select(ddFromPort, val);
+		element.select(ddFromPort, val);
 	}
 	public void selectFromMonth(String val){
-		step.select(ddFromMonth, val);
+		element.select(ddFromMonth, val);
 	}
 	public void selectFromDay(String val){
-		step.select(ddFromDay, val);
+		element.select(ddFromDay, val);
 	}
 	public void selectToPort(String val){
-		step.select(ddToPort, val);
+		element.select(ddToPort, val);
 	}
 	public void selectToMonth(String val){
-		step.select(ddToMonth, val);
+		element.select(ddToMonth, val);
 	}
 	public void selectToDay(String val){
-		step.select(ddToDay, val);
+		element.select(ddToDay, val);
 	}
 	public void selectClass(String val){
-		step.clickRadioButton(rBtnServiceClass, val);
+		element.clickRadioButton(rBtnServiceClass, val);
 	}
 	public void selectAirlinePref(String val){
-		step.select(ddAirlinePref, val);
+		element.select(ddAirlinePref, val);
 	}
 	public void clickContineu(){
-		step.click(bntContinue);
+		element.click(bntContinue);
 	}
 	
 }

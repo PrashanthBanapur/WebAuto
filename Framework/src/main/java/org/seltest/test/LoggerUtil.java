@@ -13,7 +13,7 @@ public class LoggerUtil {
 
 
 	private static LoggerUtil logger = new LoggerUtil();
-	private final Logger seltest = LoggerFactory.getLogger("SELTEST");
+	private final Logger seltest = LoggerFactory.getLogger(LoggerUtil.class);
 
 	// Cannot Create instance
 	private LoggerUtil(){

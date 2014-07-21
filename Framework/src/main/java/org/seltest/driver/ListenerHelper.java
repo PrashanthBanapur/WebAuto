@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.annotation.Annotation;
 
 import org.openqa.selenium.WebDriver;
+import org.seltest.core.Config;
 import org.seltest.core.SelTestException;
 import org.seltest.core.TestCase;
 import org.seltest.core.TestInfo;
@@ -27,6 +28,7 @@ public class ListenerHelper {
 
 	private Logger log = LoggerFactory.getLogger(ListenerHelper.class);
 	private static String parallelMode;
+	private static String browser = Config.browser.getValue();
 	private static Boolean suiteCalled = false; //TODO To avoid calling suite listeners twice
 
 	// restricting to Package Access
@@ -98,6 +100,11 @@ public class ListenerHelper {
 		if(! (parallelMode.equals("false")|| parallelMode.equals("tests") )){
 			throw new SelTestException("Unknow Parallel Mode in Suite file !!");
 		}
+		
+		if(browser.equals("ie") && !(parallelMode.equals("false"))){ // Validating IE parallel Mode
+			log.warn(" IE Does Not Support Parallel Execution !! ");
+			throw new SelTestException("Parallel Not Support Change Suite Config 'parallel= false' "+suite.getName());
+		}
 
 		if(!suiteCalled){
 			log.info("");
@@ -105,7 +112,7 @@ public class ListenerHelper {
 			log.info("");
 			String path = new File("./","src/main/resources/atu.properties").getAbsolutePath();
 			System.setProperty("atu.reporter.config", path);
-			if(!parallelMode.equals("tests")){ // Only Tests supported
+			if(!parallelMode.equals("tests")){ // Only Parallel Mode supported : Tests 
 				createWebDriver();
 			}
 			suiteCalled=true;

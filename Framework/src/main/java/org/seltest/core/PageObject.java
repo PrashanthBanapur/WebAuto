@@ -13,7 +13,14 @@ import org.slf4j.LoggerFactory;
 public class PageObject {
 	protected WebDriver driver;
 	private final Logger log = LoggerFactory.getLogger(PageObject.class);
-	protected final static Step step = new Step();
+	/**
+	 * An Element Class Instance which should be used to interact with the WebElements 
+	 */
+	protected final Element element = new Element();
+	/**
+	 * A Browser Class Instance which should be used to interact with browsers
+	 */
+	protected final Browser browser = new Browser();
 
 	public PageObject(WebDriver driver){
 		log.trace("Created Page Object on Driver : {} ",driver.hashCode());

@@ -3,44 +3,28 @@ package org.seltest.test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.AbstractWebDriverEventListener;
-import org.seltest.core.Config;
-import org.seltest.core.StepUtil;
+import org.seltest.core.Browser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WebEventListener extends AbstractWebDriverEventListener {
 
-	private static final int MAX_RETRY = Integer.parseInt(Config.exceptionRetry.getValue());
-	private static final int DEFAULT_WAIT = Integer.parseInt(Config.defaultWait.getValue());
 	private static final Logger log = LoggerFactory.getLogger(WebEventListener.class);
 	private static final LoggerUtil logger = LoggerUtil.getLogger();
+	private final Browser browser = new Browser();
 
 
 	public void afterClickOn(WebElement element , WebDriver driver){
 		log.trace("After Click On : {} ",element);
 		/*NOTE : Dont Add any check here 
-		 * as POP will fail if some action is done after click
+		 * as Alert will fail if some action is done after click
 		 */
 	}
 	public void beforeFindBy(By by, WebElement element, WebDriver driver) {
-		int retry=0;
 		log.trace("Before Find By :{} ",by);
-		while(retry<MAX_RETRY){
-			try{
-				StepUtil.waitElementVisible(driver,by,DEFAULT_WAIT);
-				break;
-			}catch(TimeoutException ex){
-				if(retry==MAX_RETRY/2){
-					StepUtil.reloadPage(driver);
-				}
-			}finally{
-				retry++;
-			}
-		}
 	}
 
 	public void afterFindBy(By by, WebElement element, WebDriver driver) {
@@ -49,47 +33,30 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 
 	public void afterNavigateTo(String url, WebDriver driver) {
 		log.info(LoggerUtil.webFormat()+"(NAVIGATE)	-> To Url : {} ",url);
-		StepUtil.waitForPageLoaded(driver);
+		browser.waitForPageLoaded(driver);
 		ReportUtil.reportWebStep(null,"GO TO ", url , "");
 	}
 
 	public void beforeClickOn(WebElement element, WebDriver driver) {
-		String elementValue;
-		if(element.getAttribute("value")!=null){
-			elementValue=element.getAttribute("value");
-		}else{
-			elementValue=element.getText();
-		}
-		log.info(LoggerUtil.webFormat()+"(CLICK ON)	-> Element = '{}'",elementValue);
-		ReportUtil.reportWebStep(element,"CLICK",elementValue,"");
+		String elemIdentity = getElementIdentity(element);
+		log.info(LoggerUtil.webFormat()+"(CLICK ON)	-> Element = '{}'",elemIdentity);
+		ReportUtil.reportWebStep(element,"CLICK",elemIdentity,"");
 
 	}
 
 	public void afterChangeValueOf(WebElement element , WebDriver driver){
 		String elemValue = element.getAttribute("value");
-		String elemName = element.getAttribute("name");
-		String elemId = element.getAttribute("id");
-		if(elemId.length()>3){
-			log.info(LoggerUtil.webFormat()+"(CHANGED)	-> Element = '"+elemId+"' New Value = '{}'",elemValue);
-			ReportUtil.reportWebStep(element,"CHANGED",elemId,elemValue);
-
-		}else{
-			log.info(LoggerUtil.webFormat()+"(CHANGED)	-> Element = '"+elemName+"' New Value = '{}'",elemValue);
-			ReportUtil.reportWebStep(element ,"CHANGED",elemId,elemValue);
-		}
+		String elemIdentity = getElementIdentity(element);
+		log.info(LoggerUtil.webFormat()+"(CHANGED)	-> Element = '"+elemIdentity+"' New Value = '{}'",elemValue);
+		ReportUtil.reportWebStep(element,"CHANGED",elemIdentity,elemValue);
 
 	}
 
 	public void beforeChangeValueOf(WebElement element, WebDriver driver) {
 		String elemValue = element.getAttribute("value");
-		String elemName = element.getAttribute("name");
-		String elemId = element.getAttribute("id");
-		if(elemId.length()>3){
-			log.info(LoggerUtil.webFormat()+"(CHANGING)	-> Element = '"+elemId+"' Old Value = '{}' ",elemValue);
-		}else {
-			log.info(LoggerUtil.webFormat()+"(CHANGING)	-> Element = '"+elemName+"' Old Value = '{}' ",elemValue);
-
-		}
+		String elemIdentity = getElementIdentity(element);
+		log.info(LoggerUtil.webFormat()+"(CHANGING)	-> Element = '"+elemIdentity+"' Old Value = '{}' ",elemValue);
+		
 	}
 
 
@@ -107,6 +74,28 @@ public class WebEventListener extends AbstractWebDriverEventListener {
 			ReportUtil.reportException("EXCEPTION", throwable.getLocalizedMessage().substring(0, 50), "");// TODO Make it Small message
 			log.trace(throwable.getMessage());
 		}
+	}
+	
+	private String getElementIdentity(WebElement element){
+		
+		String elemId = element.getAttribute("id");
+		String elemClass = element.getAttribute("class");
+		String elemName = element.getAttribute("name");
+		String elemText = element.getText();
+		String elementIdentity = "";
+		
+		if( (elemId != null) && (!elemId.isEmpty())){
+			elementIdentity=elemId;
+		}else if( (elemClass != null) && (! elemClass.isEmpty())){
+			elementIdentity= elemClass;
+		}else if((elemName != null) &&  (! elemName.isEmpty())){
+			elementIdentity= elemName;
+		}else if ((elemText != null ) && (! elemText.isEmpty())){
+			elementIdentity = elemText;
+		}
+		
+		return elementIdentity;
+		
 	}
 
 

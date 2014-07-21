@@ -2,9 +2,11 @@ package org.seltest.core;
 
 import java.io.IOException;
 import java.util.Properties;
+import org.openqa.selenium.Platform;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 
 /**
@@ -23,9 +25,8 @@ public enum Config {
 	eventfiring,
 	fullscreen,
 	captureScreenshot,
-	explictWaitMaxTimeout,
+	waitMaxTimeout,
 	exceptionRetry,
-	defaultWait,
 	dbDriver,
 	dbUrl,
 	dbUsername,
@@ -47,12 +48,12 @@ public enum Config {
 		if (value == null) {
 			init();
 		}
-		
+
 		// Driver Path will be in user home
 		if(this.equals(driverPath)){
 			value = System.getProperty("user.home")+value;
 		}
-		
+
 		log.debug("Config : '{}' Value : '{}' ",this.name(),value);
 		return value;
 	}
@@ -61,9 +62,24 @@ public enum Config {
 
 		switch(config){
 		case browser :
-			if(!(val.equals("firefox")|| val.equals("chrome") || value.equals("ie"))){
+			if(!(val.equals("firefox")|| val.equals("chrome") || value.equals("ie") || value.equals("safari"))){
 				throw new SelTestException("Invalid Browser !");
 			}
+
+			Platform current = Platform.getCurrent();
+			if( val.equals("safari") && !(Platform.MAC.is(current) )){
+				throw new SelTestException(" Safari Browser Works Only in Mac OS !! ");
+			}
+
+			if( val.equals("ie") ){
+				if(!Platform.WINDOWS.is(current)){
+					throw new SelTestException(" IE Browser Works Only in Windows OS !!");
+				}
+
+				log.warn(" IE Driver need the Browser To Be In Focus !! ");
+				log.warn("Please Dont Use Machine !!");
+			}
+
 			break;
 		case baseUrl :
 			if(!val.contains("http")){
@@ -79,11 +95,9 @@ public enum Config {
 				log.warn(" Framework Wont work properly : eventfiring : {} ",val);
 			}
 			break;
-		case explictWaitMaxTimeout :
+		case waitMaxTimeout :
 			break;
 		case exceptionRetry :
-			break;
-		case defaultWait :
 			break;
 		case fullscreen :
 			break;

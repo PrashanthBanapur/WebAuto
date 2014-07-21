@@ -44,11 +44,11 @@ public class ReportUtil {
 
 		if(screenShot.equals("all")&& (element != null)){
 			WebDriver driver = DriverManager.getDriver();
-			
+
 			if(browser.equals("firefox")){
-			String border =highlightElement(driver, element);
-			reportWithScreenshot(desp, msg1,msg2,LogAs.PASSED);
-			unhighlightElement(driver, element, border);
+				String border =highlightElement(driver, element);
+				reportWithScreenshot(desp, msg1,msg2,LogAs.PASSED);
+				unhighlightElement(driver, element, border);
 			}else{
 				reportWithScreenshot(desp, msg1, msg2, LogAs.PASSED);
 			}
@@ -85,12 +85,13 @@ public class ReportUtil {
 	 * @param msg2
 	 */
 	static void reportException(String desp,String msg1 , String msg2){
+		//reportWithoutScreenshot(desp, msg1,msg2 , LogAs.FAILED);
 		reportWithoutScreenShot(desp, msg1, msg2, LogAs.WARNING);
 	}
 
 	private static void reportWithoutScreenShot(String msg1,String msg2,String msg3,LogAs logType){
 		try{
-			ATUReports.add(msg1,msg2, msg3,logType, new CaptureScreen(
+			ATUReports.add(msg1,msg2,msg3, logType, new CaptureScreen(
 					ScreenshotOf.DESKTOP));
 		}catch(Exception e){
 			// TODO
@@ -104,9 +105,9 @@ public class ReportUtil {
 		}else{
 
 			try{
-			ATUReports.setWebDriver(driver);
-			ATUReports.add(msg1,msg2,msg3,logType, new CaptureScreen(
-					ScreenshotOf.BROWSER_PAGE));
+				ATUReports.setWebDriver(driver);
+				ATUReports.add(msg1,msg2,msg3,logType, new CaptureScreen(
+						ScreenshotOf.BROWSER_PAGE));
 			}catch(Exception e){
 				log.trace("Screen Shot not captured : "+msg2);
 				log.trace(e.toString());
