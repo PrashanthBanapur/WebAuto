@@ -3,7 +3,6 @@ package pageobject;
 
 import java.util.List;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.seltest.core.PageObject;
@@ -33,9 +32,6 @@ public class FlightFinderPage extends PageObject {
 	@FindBy(name="findFlights")
 	private WebElement bntContinue;
 
-	public FlightFinderPage(WebDriver driver) {
-		super(driver);
-	}
 	public void selectTripType(String val){
 		element.clickRadioButton(rBtnTripType, val);
 	}
