@@ -16,11 +16,14 @@ import atu.testng.selenium.reports.CaptureScreen.ScreenshotOf;
 
 public class ReportUtil {
 
-	private static final String screenShot = Config.captureScreenshot
-			.getValue();
-	private static final String browser = Config.browser.getValue();
-	private static final Logger log = LoggerFactory.getLogger(ReportUtil.class);
+	public static ReportUtil report = new ReportUtil();
+	private  final String screenShot = Config.captureScreenshot.getValue();
+	private  final String browser = Config.browser.getValue();
+	private  final Logger log = LoggerFactory.getLogger(ReportUtil.class);
 
+	// Avoid creating objects
+	private ReportUtil(){
+	}
 	/**
 	 * Report result of test case
 	 * 
@@ -28,7 +31,7 @@ public class ReportUtil {
 	 * @param msg1
 	 * @param msg2
 	 */
-	public static void reportResult(String desp, String msg1, String msg2) {
+	public void reportResult(String desp, String msg1, String msg2) {
 
 		if (screenShot.equals("all") || screenShot.equals("result")) {
 			reportWithScreenshot(desp, msg1, msg2, LogAs.INFO);
@@ -45,7 +48,7 @@ public class ReportUtil {
 	 * @param msg1
 	 * @param msg2
 	 */
-	static void reportWebStep(WebElement element, String desp, String msg1,
+	void reportWebStep(WebElement element, String desp, String msg1,
 			String msg2) {
 
 		if (screenShot.equals("all") && (element != null)) {
@@ -71,7 +74,7 @@ public class ReportUtil {
 	 * @param actual
 	 * @param exp
 	 */
-	public static void reportAssert(String desp, String expected, String actual) {
+	public void reportAssert(String desp, String expected, String actual) {
 		if (expected == null) {
 			expected = "";
 		}
@@ -96,22 +99,21 @@ public class ReportUtil {
 	 * @param msg1
 	 * @param msg2
 	 */
-	static void reportException(String desp, String msg1, String msg2) {
+	void reportException(String desp, String msg1, String msg2) {
 		// reportWithoutScreenshot(desp, msg1,msg2 , LogAs.FAILED);
 		reportWithoutScreenShot(desp, msg1, msg2, LogAs.WARNING);
 	}
 
-	private static void reportWithoutScreenShot(String msg1, String msg2,
+	private  void reportWithoutScreenShot(String msg1, String msg2,
 			String msg3, LogAs logType) {
 		try {
-			ATUReports.add(msg1, msg2, msg3, logType, new CaptureScreen(
-					ScreenshotOf.DESKTOP));
+			ATUReports.add(msg1, msg2, msg3, logType,new CaptureScreen(ScreenshotOf.BROWSER_PAGE));
 		} catch (Exception e) {
 			// TODO
 		}
 	}
 
-	private static synchronized void reportWithScreenshot(String msg1,
+	private  synchronized void reportWithScreenshot(String msg1,
 			String msg2, String msg3, LogAs logType) {
 		WebDriver driver = DriverManager.getDriver();
 		if (driver == null) {
@@ -122,7 +124,7 @@ public class ReportUtil {
 				ATUReports.setWebDriver(driver);
 				ATUReports.add(msg1, msg2, msg3, logType, new CaptureScreen(
 						ScreenshotOf.BROWSER_PAGE));
-			} catch (Exception e) {
+			} catch ( Exception e) {
 				log.trace("Screen Shot not captured : " + msg2);
 				log.trace(e.toString());
 			}
@@ -136,7 +138,7 @@ public class ReportUtil {
 	 * @param element
 	 * @return current border
 	 */
-	private static String highlightElement(WebDriver driver, WebElement element) {
+	private String highlightElement(WebDriver driver, WebElement element) {
 		// draw a border around the found element
 		String border = null;
 		if (driver instanceof JavascriptExecutor) {
@@ -155,7 +157,7 @@ public class ReportUtil {
 	 * @param driver
 	 * @return
 	 */
-	private static WebElement unhighlightElement(WebDriver driver,
+	private WebElement unhighlightElement(WebDriver driver,
 			WebElement element, String border) {
 		if (driver instanceof JavascriptExecutor) {
 			try {
@@ -168,7 +170,7 @@ public class ReportUtil {
 		return element;
 	}
 
-	private static final String SCRIPT_GET_ELEMENT_BORDER = " var elem = arguments[0]; "
+	private final String SCRIPT_GET_ELEMENT_BORDER = " var elem = arguments[0]; "
 			+ " if (elem.currentStyle) { "
 			+ "   var style = elem.currentStyle; "
 			+ "   var border = style['borderTopWidth'] "
@@ -199,7 +201,7 @@ public class ReportUtil {
 			+ "           + ' ' + style.getPropertyValue('border-left-color'); "
 			+ "	} " + "return border;";
 
-	private static final String SCRIPT_UNHIGHLIGHT_ELEMENT = "	var elem = arguments[0]; "
+	private final String SCRIPT_UNHIGHLIGHT_ELEMENT = "	var elem = arguments[0]; "
 			+ "var borders = arguments[1].split(';');"
 			+ "elem.style.borderTop = borders[0];"
 			+ "elem.style.borderRight = borders[1];"

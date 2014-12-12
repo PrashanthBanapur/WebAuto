@@ -13,7 +13,7 @@ import org.openqa.selenium.safari.SafariDriver;
 import org.seltest.core.Config;
 import org.seltest.test.LoggerUtil;
 
-final class DriverFactory {
+public final class DriverFactory {
 
 	private static String browser;
 	private static String driverPath;
@@ -33,7 +33,7 @@ final class DriverFactory {
 	/**
 	 * Method to get WebDriver based on app properties
 	 */
-	static WebDriver getDriver() {
+	public static WebDriver getDriver() {
 		WebDriver driver = null;
 		if (browser.equalsIgnoreCase("FIREFOX")) {
 			ProfilesIni profile = new ProfilesIni();
@@ -80,12 +80,10 @@ final class DriverFactory {
 
 		if (Platform.MAC.is(current)) {
 			return "";
-		} else if (Platform.WINDOWS.is(current)) {
-			return ".exe";
 		} else if (Platform.LINUX.is(current)) {
 			return "";
-		} else {
-			return "";
+		} else {	// TODO after 2.43.1 Platform.WINDOWS was not working . quick fix
+			return ".exe";
 		}
 	}
 

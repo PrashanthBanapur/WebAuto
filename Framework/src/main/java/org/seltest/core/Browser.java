@@ -7,13 +7,15 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.seltest.driver.DriverFactory;
 import org.seltest.driver.DriverManager;
+import org.seltest.driver.PageElementLocator;
 import org.seltest.test.LoggerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,16 +36,17 @@ public class Browser {
 	 * @param Time
 	 *            in seconds
 	 */
-	public void simpleWait(int minWait) {
-		log.debug("(WAIT SEC)	-> TIME = " + minWait + " sec ");
+	public void simpleWait(int sec) {
+		log.debug("(WAIT SEC)	-> TIME = " + sec + " sec ");
 		org.openqa.selenium.browserlaunchers.Sleeper
-				.sleepTightInSeconds(minWait);
+		.sleepTightInSeconds(sec);
 	}
 
 	public void simpleWaitMillSec(int millSec) {
 		log.debug("(WAIT MILL-SEC)	-> TIME = " + millSec + " mill sec ");
 		org.openqa.selenium.browserlaunchers.Sleeper.sleepTight(millSec);
 	}
+
 
 	/**
 	 * Wait For the Page to Load in the Browser
@@ -83,7 +86,7 @@ public class Browser {
 		Iterator<String> winItr = windows.iterator();
 
 		if (driver.getTitle().equals(title)) { // Both have same title switch to
-												// 2nd
+			// 2nd
 			throw new IllegalArgumentException(
 					"Current Title and Swicth window title are same ");
 		}
@@ -146,7 +149,7 @@ public class Browser {
 
 		if (browserName.equalsIgnoreCase("safari")) {
 			((JavascriptExecutor) driver)
-					.executeScript("confirm = function(message){return true;};");
+			.executeScript("confirm = function(message){return true;};");
 		} else {
 			driver.switchTo().alert().accept();
 		}
@@ -154,13 +157,19 @@ public class Browser {
 		log.trace("Alert Accepted :");
 	}
 
-	public WebDriver getSimpleDriver(WebDriver driver) {
-		WebDriver simpleDriver = driver;
-		if (driver instanceof EventFiringWebDriver) {
-			EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) driver;
-			simpleDriver = eventFirDriver.getWrappedDriver();
-		}
-		return simpleDriver;
+	/**
+	 * Check Alert is Present in Page
+	 * @return state
+	 */
+	public synchronized boolean isAlert(){
+		WebDriver driver = DriverManager.getDriver();
+
+		try { 
+			driver.switchTo().alert(); 
+			return true; 
+		} catch (NoAlertPresentException Ex) { 
+			return false; 
+		} 
 	}
 
 	public synchronized void goToURL(String url) {
@@ -173,9 +182,25 @@ public class Browser {
 		return PageFactory.initElements(driver, pageClass);
 	}
 
+	public synchronized <T>T createPage(PageElementLocator pElement,Class<T> pageClass){
+		WebDriver driver = DriverManager.getDriver();
+		T page = PageFactory.initElements(driver, pageClass);
+		PageFactory.initElements(pElement, page);
+		return page;
+
+	}
+
 	public synchronized void verifyStartPage(StartState state) {
 		if (!state.isStartState()) {
 			state.goToStartPage();
 		}
+	}
+
+	public WebDriver createBrowser(){
+		return DriverFactory.getDriver();
+	}
+
+	public void closeBrowser(WebDriver driver){
+		driver.quit();
 	}
 }

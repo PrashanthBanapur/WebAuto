@@ -12,4 +12,6 @@ public interface StartState {
 	public Boolean isStartState();
 
 	public void goToStartPage();
+	
+	public String userName();
 }

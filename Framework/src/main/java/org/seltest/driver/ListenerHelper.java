@@ -8,7 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.seltest.core.Config;
 import org.seltest.core.SelTestException;
-import org.seltest.core.TestCase;
+import org.seltest.core.TestCaseDetail;
 import org.seltest.core.TestInfo;
 import org.seltest.test.LoggerUtil;
 import org.seltest.test.ReportUtil;
@@ -32,6 +32,7 @@ import atu.testng.reports.ATUReports;
 public class ListenerHelper {
 
 	private Logger log = LoggerFactory.getLogger(ListenerHelper.class);
+	private ReportUtil report = ReportUtil.report;
 	private static String parallelMode;
 	private static String browser = Config.browser.getValue();
 	private static Boolean suiteCalled = false; // TODO To avoid calling suite
@@ -52,10 +53,13 @@ public class ListenerHelper {
 	}
 
 	public void onTestStart(ITestResult result) {
-		TestCase.setTestName(result.getName());
+		TestCaseDetail.setTestName(result.getName());
 		log.info(LoggerUtil.testFormat() + "(START)	-> Test Case : {} ", result
 				.getMethod().getMethodName());
 		processAnnotation(result);
+		if(parallelMode.equals("methods")){
+			createWebDriver();
+		}
 
 	}
 
@@ -63,14 +67,21 @@ public class ListenerHelper {
 		log.info(LoggerUtil.testFormat() + "(SUCCESS)	-> Test Case : {} ",
 				result.getMethod().getMethodName());
 		setTestInfo();
-		ReportUtil.reportResult("SUCCESS", result.getName(), "");
+		report.reportResult("SUCCESS", result.getName(), "");
+
+		if(parallelMode.equals("methods")){
+			quitWebDriver();
+		}
 	}
 
 	public void onTestFailure(ITestResult result) {
 		log.info(LoggerUtil.testFormat() + "(FAIL)	-> Test Case : {} ", result
 				.getMethod().getMethodName());
 		setTestInfo();
-		ReportUtil.reportResult("FAIL", result.getName(), "");
+		report.reportResult("FAIL", result.getName(), "");
+		if(parallelMode.equals("methods")){
+			quitWebDriver();
+		}
 
 	}
 
@@ -78,7 +89,10 @@ public class ListenerHelper {
 		log.info(LoggerUtil.testFormat() + "(SKIPPED)	-> Test Case : {} ",
 				result.getMethod().getMethodName());
 		setTestInfo();
-		ReportUtil.reportResult("SKIP", result.getName(), "");
+		report.reportResult("SKIP", result.getName(), "");
+		if(parallelMode.equals("methods")){
+			quitWebDriver();
+		}
 
 	}
 
@@ -146,7 +160,7 @@ public class ListenerHelper {
 		parallelMode = suite.getParallel().toLowerCase();// Get parallel mode
 															// and validate
 		if (!(parallelMode.equals("false") || parallelMode.equals("tests") || parallelMode
-				.equals("classes"))) {
+				.equals("methods"))) {
 			throw new SelTestException("Unknow Parallel Mode in Suite file !!");
 		}
 
@@ -218,9 +232,9 @@ public class ListenerHelper {
 
 	private void setTestInfo() {
 		try {
-			if (TestCase.getAuthor() != null) {
-				ATUReports.setAuthorInfo(TestCase.getAuthor(),
-						TestCase.getDate(), TestCase.getVersion());
+			if (TestCaseDetail.getAuthor() != null) {
+				ATUReports.setAuthorInfo(TestCaseDetail.getAuthor(),
+						TestCaseDetail.getDate(), TestCaseDetail.getVersion());
 			}
 		} catch (Exception e) {
 			log.trace("User Information Not Set !");
@@ -257,9 +271,9 @@ public class ListenerHelper {
 			Annotation annotation = testClass.getAnnotation(TestInfo.class);
 			TestInfo testInfo = (TestInfo) annotation;
 
-			TestCase.setAuthor(testInfo.author());
-			TestCase.setDate(testInfo.lastModified());
-			TestCase.setVersion(testInfo.version());
+			TestCaseDetail.setAuthor(testInfo.author());
+			TestCaseDetail.setDate(testInfo.lastModified());
+			TestCaseDetail.setVersion(testInfo.version());
 		}
 	}
 }

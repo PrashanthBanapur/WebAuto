@@ -30,7 +30,7 @@ public class WaitEvent {
 	 */
 	public synchronized void visible(WebElement element) {
 		log.info(LoggerUtil.webFormat() + "(WAIT VISIBLE)	-> Element = '{}' ",
-				element);
+				LoggerUtil.getElementIdentity(element));
 		wait(ExpectedConditions.visibilityOf(element));
 	}
 
@@ -45,7 +45,7 @@ public class WaitEvent {
 	 */
 	public synchronized void notVisible(WebElement element) {
 		log.info(LoggerUtil.webFormat()
-				+ "(WAIT NOT VISIBLE)	-> Element = '{}' ", element);
+				+ "(WAIT NOT VISIBLE)	-> Element = '{}' ", LoggerUtil.getElementIdentity(element));
 		wait(ExpectedConditions.not(ExpectedConditions.visibilityOf(element)));
 	}
 
@@ -84,7 +84,7 @@ public class WaitEvent {
 	 */
 	public synchronized void clickable(WebElement element) {
 		log.info(LoggerUtil.webFormat()
-				+ "(WAIT  CLICKABLE)	-> Element = '{}' ", element);
+				+ "(WAIT  CLICKABLE)	-> Element = '{}' ", LoggerUtil.getElementIdentity(element));
 		wait(ExpectedConditions.elementToBeClickable(element));
 	}
 
@@ -97,7 +97,7 @@ public class WaitEvent {
 	 */
 	public synchronized void notClickable(WebElement element) {
 		log.info(LoggerUtil.webFormat()
-				+ "(WAIT NOT CLICKABLE)	-> Element = '{}' ", element);
+				+ "(WAIT NOT CLICKABLE)	-> Element = '{}' ", LoggerUtil.getElementIdentity(element));
 		wait(ExpectedConditions.not(ExpectedConditions
 				.elementToBeClickable(element)));
 	}

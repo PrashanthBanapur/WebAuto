@@ -17,7 +17,7 @@ public enum Config {
 	/**
 	 * Browser used for framework execution
 	 */
-	runMode, gridUrl, browser, version, platform, baseUrl, driverPath, eventfiring, fullscreen, captureScreenshot, waitMaxTimeout, exceptionRetry, dbDriver, dbUrl, dbUsername, dbPassword, ;
+	runMode, gridUrl, browser, version, platform, baseUrl,userName, driverPath, eventfiring, fullscreen, debug ,captureScreenshot, waitMaxTimeout, exceptionRetry, dbDriver, dbUrl, dbUsername, dbPassword, ;
 
 	private static final String PATH = "framework.properties";
 	private static final Logger log = LoggerFactory.getLogger(Config.class);
@@ -27,12 +27,21 @@ public enum Config {
 	private void init() {
 
 		initProperty();
-		value = (String) property.get(this.toString());
+		// Add To Override Config from Command Line
+		String cmdValue =System.getProperty(this.toString());		
+		if(cmdValue!= null){
+			log.info("Overriding Config : {} using Command Line Value {} ",this.toString(),cmdValue);
+			value = cmdValue;
+		}else{
+			value = (String) property.get(this.toString());
+
+		}
 		validate(this, value.toLowerCase());
 	}
 
 	public String getValue() {
 		if (value == null) {
+			log.debug("Config : '{}' Value : '{}' ", this.name(), value);
 			init();
 		}
 
@@ -40,8 +49,6 @@ public enum Config {
 		if (this.equals(driverPath)) {
 			value = System.getProperty("user.home") + value;
 		}
-
-		log.debug("Config : '{}' Value : '{}' ", this.name(), value);
 		return value;
 	}
 
@@ -61,6 +68,9 @@ public enum Config {
 				throw new SelTestException("Invalid Url Format");
 			}
 			break;
+		case debug :
+			log.debug("Debug Value Set At: {} seconds ",val);
+			break;
 		case browser:
 			if (!(val.equals("firefox") || val.equals("chrome")
 					|| value.equals("ie") || value.equals("safari"))) {
@@ -74,7 +84,7 @@ public enum Config {
 			}
 
 			if (val.equals("ie")) {
-				if (!Platform.WINDOWS.is(current)) {
+				if (!Platform.WINDOWS.is(current) && (runMode.getValue().equals("single"))) {
 					throw new SelTestException(
 							" IE Browser Works Only in Windows OS !!");
 				}
@@ -87,6 +97,11 @@ public enum Config {
 		case baseUrl:
 			if (!val.contains("http")) {
 				throw new SelTestException("Invalid Url Format");
+			}
+			break;
+		case userName:
+			if(val==null){
+				throw new SelTestException("User Name is Blank");
 			}
 			break;
 		case captureScreenshot:

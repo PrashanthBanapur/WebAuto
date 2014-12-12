@@ -2,10 +2,12 @@ package org.seltest.core;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.InvalidSelectorException;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -18,6 +20,7 @@ import org.openqa.selenium.support.ui.Select;
 import org.seltest.driver.DriverManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Class contains all the method to be used to intract with WebElement <br/>
@@ -33,11 +36,15 @@ import org.slf4j.LoggerFactory;
 public class Element {
 	private final Browser browser = new Browser();
 	public final WaitEvent wait = new WaitEvent();
+	private int debug = Integer.parseInt(Config.debug.getValue());
 	private static Logger log = LoggerFactory.getLogger(Element.class);
 	private static final int MAX_RETRY = Integer.parseInt(Config.exceptionRetry
 			.getValue());
 	private static final int EXCEPTION_INTERVAL = Integer
 			.parseInt(Config.waitMaxTimeout.getValue()) / MAX_RETRY;
+	
+	private static final int MAX_WAIT = Integer.parseInt(Config.waitMaxTimeout
+			.getValue());
 
 	Element() {
 	}
@@ -70,7 +77,7 @@ public class Element {
 	 * @param element
 	 *            WebElement which has check box
 	 */
-	public void checkboxClick(WebElement element) {
+	public void clickCheckbox(WebElement element) {
 		log.trace("Click on CheckBox : {}", element);
 		click(element.findElement(By.cssSelector("input[type='checkbox']")));
 	}
@@ -143,6 +150,11 @@ public class Element {
 
 		log.trace(" Element Click : {} ", element);
 		element.click();
+		
+		if(debug>0){
+			log.trace("Debug Mode At {} seconds ",debug);
+			browser.simpleWait(debug);
+		}
 	}
 
 	/**
@@ -157,7 +169,7 @@ public class Element {
 		for (WebElement radioBtn : lstRadioButton) {
 			if (getText(radioBtn).equals(val)) {
 				radioBtn.findElement(By.cssSelector("input[type='radio']"))
-						.click();
+				.click();
 			}
 		}
 
@@ -195,10 +207,18 @@ public class Element {
 		browser.waitForPageLoaded();
 	}
 
-	public synchronized void mouseOver(WebElement element) {
+	public synchronized Actions mouseOver(WebElement element) {
 		WebDriver driver = DriverManager.getDriver();
 		Actions actions = new Actions(driver);
-		actions.moveToElement(element).build().perform();
+		return actions.moveToElement(element);
+	}
+	
+	public void performClick(Actions action){
+		log.trace("Performing Click in Actions ");
+		action.click().build().perform();
+		if(debug>0){
+			browser.simpleWait(debug);
+		}
 	}
 
 	/**
@@ -217,6 +237,7 @@ public class Element {
 				if (value == null && text == null) {
 					browser.simpleWait(3);
 				} else if (value != null) {
+					log.trace("Go Value : {} on Retry : {} ", value, retry);
 					return value;
 				} else if (text != null) {
 					log.trace("Go Text : {} on Retry : {} ", text, retry);
@@ -241,20 +262,42 @@ public class Element {
 	 * @param element
 	 * @see WebElement
 	 */
-	public boolean isDisplayed(WebElement element) {
+	public synchronized boolean isDisplayed(WebElement element) {
 		log.trace("Is Displayed Element : {}", element);
 		WebDriver driver = DriverManager.getDriver();
-		WebDriver simpleDriver = browser.getSimpleDriver(driver);
+		removeImplicitWait(driver);
 		try {
-			String value = getValue(element);
-			By by = getBy(element, value);
-			if (simpleDriver.findElement(by).isDisplayed()) {
+			if (element.isDisplayed()) {
 				return true;
 			} else {
 				return false;
 			}
 		} catch (NoSuchElementException ex) {
 			return false;
+		}finally{
+			addImplicitWait(driver);
+		}
+	}
+	/**
+	 * Verify if By is Displayed
+	 * 
+	 * @param element
+	 * @see WebElement
+	 */
+	public synchronized boolean isDisplayed(By by){
+		log.trace("Is Displayed Element : {}", by);
+		WebDriver driver = DriverManager.getDriver();
+		removeImplicitWait(driver);
+		try{
+			if(driver.findElement(by).isDisplayed()){
+				return true;
+			}else{
+				return false;
+			}
+		} catch(NoSuchElementException ex){
+			return false;
+		}finally{
+			addImplicitWait(driver);
 		}
 	}
 
@@ -265,18 +308,36 @@ public class Element {
 	 */
 	public boolean isEnabled(WebElement element) {
 		log.trace("Is Enabled Element : {}", element);
-		WebDriver driver = DriverManager.getDriver();
-		WebDriver simpleDriver = browser.getSimpleDriver(driver);
 		try {
-			String value = getValue(element);
-			By by = getBy(element, value);
-			if (simpleDriver.findElement(by).isEnabled()) {
+			if (element.isEnabled()) {
 				return true;
 			} else {
 				return false;
 			}
 		} catch (NoSuchElementException ex) {
 			return false;
+		}
+	}
+	
+	/**
+	 * Verify if an By is Enabled
+	 * 
+	 * @param element
+	 */
+	public synchronized boolean isEnabled(By by){
+		log.trace("Is Enabled Element : {}", by);
+		WebDriver driver = DriverManager.getDriver();
+		removeImplicitWait(driver);
+		try {
+			if (driver.findElement(by).isEnabled()) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (NoSuchElementException ex) {
+			return false;
+		}finally{
+			addImplicitWait(driver);
 		}
 	}
 
@@ -287,17 +348,14 @@ public class Element {
 	 */
 	public boolean isSelected(WebElement element) {
 		log.trace("Is Selected Element : {}", element);
-		WebDriver driver = DriverManager.getDriver();
-		WebDriver simpleDriver = browser.getSimpleDriver(driver);
 		try {
-			String value = getValue(element);
-			By by = getBy(element, value);
-			if (simpleDriver.findElement(by).isSelected()) {
+			if (element.isSelected()) {
 				return true;
 			} else {
 				return false;
 			}
 		} catch (NoSuchElementException ex) {
+			log.trace("Exception : isSelected : {} ",ex);
 			return false;
 		}
 	}
@@ -335,9 +393,9 @@ public class Element {
 	 *            text to be send
 	 * @see WebElement
 	 */
-	public void sendKeys(WebElement element, CharSequence... arg0) {
-		log.trace("Send Key : {} on Element : {} ", arg0, element);
-		element.sendKeys(arg0);
+	public void sendKeys(WebElement element, CharSequence... txt) {
+		log.trace("Send Key : {} on Element : {} ", txt, element);
+		element.sendKeys(txt);
 
 	}
 
@@ -353,7 +411,12 @@ public class Element {
 		element.submit();
 	}
 
-	private String getValue(WebElement element) {
+	/**
+	 * Get the Value used to identify the element 
+	 * @param element
+	 * @return
+	 */
+	public String getValue(WebElement element) {
 		String elementType = element.toString();
 		int valueBeginIndex = elementType.lastIndexOf(':') + 2;
 		int valueEndIndex = elementType.lastIndexOf(']');
@@ -361,7 +424,14 @@ public class Element {
 		return value;
 	}
 
-	private By getBy(WebElement element, String value) {
+	/**
+	 * Get the By of an element <br>
+	 * <b><i> Does Not work with FindBys </i>
+	 * @param element
+	 * @param value
+	 * @return
+	 */
+	public By getBy(WebElement element, String value) {
 		String elementType = element.toString();
 		if (elementType.contains("partial link text")) {
 			return By.partialLinkText(value);
@@ -545,6 +615,16 @@ public class Element {
 	public WebElement findElement(WebElement element, By by) {
 		return element.findElement(by);
 	}
+	
+	public synchronized WebElement findElement(By by){
+		WebDriver driver = DriverManager.getDriver();
+		return driver.findElement(by);
+	}
+	
+	public synchronized List<WebElement> findElements(By by){
+		WebDriver driver = DriverManager.getDriver();
+		return driver.findElements(by);
+	}
 
 	public Point getLocation(WebElement element) {
 		return element.getLocation();
@@ -566,4 +646,22 @@ public class Element {
 		return element.getCssValue(propertyName);
 	}
 
+	public synchronized void scrollVisible(WebElement element) {
+		WebDriver driver = DriverManager.getDriver();
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+
+	}
+
+	public synchronized void touchImage(WebElement canvas , int x, int y) {
+		WebDriver driver = DriverManager.getDriver();
+		new Actions(driver).moveToElement(canvas, x, y).click().perform();
+	}
+
+	private void removeImplicitWait(WebDriver driver) {
+		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+	}
+	
+	private void addImplicitWait(WebDriver driver){
+		driver.manage().timeouts().implicitlyWait(MAX_WAIT, TimeUnit.SECONDS);
+	}
 }

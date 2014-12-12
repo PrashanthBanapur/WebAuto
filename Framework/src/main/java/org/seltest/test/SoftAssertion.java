@@ -15,11 +15,12 @@ import org.testng.collections.Maps;
 public class SoftAssertion extends Assertion {
 	// LinkedHashMap to preserve the order
 	private Map<AssertionError, IAssert> m_errors = Maps.newLinkedHashMap();
+	private ReportUtil report = ReportUtil.report;
 
 	@Override
 	public void executeAssert(IAssert a) {
 		try {
-			ReportUtil.reportAssert("VERIFY : " + a.getMessage(), a
+			report.reportAssert("VERIFY : " + a.getMessage(), a
 					.getExpected().toString(), a.getActual().toString());
 			a.doAssert();
 		} catch (AssertionError ex) {

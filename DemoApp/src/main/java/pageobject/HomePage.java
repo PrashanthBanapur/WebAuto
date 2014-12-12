@@ -42,4 +42,10 @@ public class HomePage extends PageObject implements StartState{
 		element.click(lnkSignOff);
 	}
 
+	@Override
+	public String userName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
