@@ -1,9 +1,7 @@
 package pageobject;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 import org.seltest.core.PageObject;
 
 public class SignOnPage extends PageObject {
@@ -18,35 +16,31 @@ public class SignOnPage extends PageObject {
 	@FindBy(name="login")
 	private WebElement imgLogin;
 	
-	public SignOnPage(WebDriver driver) {
-		super(driver);
-	}
-	
 	public FlightFinderPage defaultLogin(){
 		setUserName(USERNAME);
 		setPassword(PASSWORD);
 		clickLogin();
-		return PageFactory.initElements(driver, FlightFinderPage.class);
+		return browser.createPage(FlightFinderPage.class);
 	}
 
 	public String getUserName() {
-		return step.getText(txtUserName);
+		return element.getText(txtUserName);
 	}
 
 	public void setUserName(String val) {
-		step.sendKeys(txtUserName, val);
+		element.sendKeys(txtUserName, val);
 	}
 
 	public String getPassword() {
-		return step.getText(txtPassword);
+		return element.getText(txtPassword);
 	}
 
 	public void setPassword(String val) {
-		step.sendKeys(txtPassword,val);
+		element.sendKeys(txtPassword,val);
 	}
 
 	public void clickLogin() {
-		step.click(imgLogin);;
+		element.click(imgLogin);;
 	}
 
 }
